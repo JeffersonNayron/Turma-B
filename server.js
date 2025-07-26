@@ -52,8 +52,20 @@ app.post('/iniciar', (req, res) => {
   const { id } = req.body;
   const inicio = new Date();
   const fim = new Date(inicio.getTime() + 60000);
-  const horaInicio = inicio.toLocaleTimeString();
-  const horaFim = fim.toLocaleTimeString();
+
+  const horaInicio = inicio.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  const horaFim = fim.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
 
   db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
     ['🟡', horaInicio, horaFim, id], (err) => {
@@ -61,11 +73,14 @@ app.post('/iniciar', (req, res) => {
         console.error(err);
         return res.status(500).send('Erro ao iniciar pessoa');
       }
+
+      // Após 60 segundos, troca o status para 🟢
       setTimeout(() => {
         db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
           if (e) console.error(e);
         });
       }, 60000);
+
       res.sendStatus(200);
     }
   );
