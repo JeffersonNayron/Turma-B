@@ -27,6 +27,10 @@ db.serialize(() => {
 // Listar todas pessoas
 app.get('/pessoas', (req, res) => {
   db.all("SELECT * FROM pessoas", [], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao listar pessoas');
+    }
     res.json(rows);
   });
 });
@@ -34,7 +38,11 @@ app.get('/pessoas', (req, res) => {
 // Adicionar pessoa
 app.post('/adicionar', (req, res) => {
   const { nome, local } = req.body;
-  db.run("INSERT INTO pessoas (nome, local) VALUES (?, ?)", [nome, local], () => {
+  db.run("INSERT INTO pessoas (nome, local) VALUES (?, ?)", [nome, local], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao adicionar pessoa');
+    }
     res.sendStatus(200);
   });
 });
@@ -48,9 +56,15 @@ app.post('/iniciar', (req, res) => {
   const horaFim = fim.toLocaleTimeString();
 
   db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
-    ['🟡', horaInicio, horaFim, id], () => {
+    ['🟡', horaInicio, horaFim, id], (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erro ao iniciar pessoa');
+      }
       setTimeout(() => {
-        db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id]);
+        db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
+          if (e) console.error(e);
+        });
       }, 60000);
       res.sendStatus(200);
     }
@@ -59,26 +73,44 @@ app.post('/iniciar', (req, res) => {
 
 // Excluir pessoa
 app.post('/excluir', (req, res) => {
-  db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], () => {
+  db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao excluir pessoa');
+    }
     res.sendStatus(200);
   });
 });
 
 // Limpar dados
 app.post('/limpar', (req, res) => {
-  db.run("DELETE FROM pessoas", () => {
+  db.run("DELETE FROM pessoas", (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao limpar dados');
+    }
+    res.sendStatus(200);
+  });
+});
+
+// Atualizar local da pessoa (edição inline)
+app.post('/editarLocal', (req, res) => {
+  const { id, local } = req.body;
+  db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao atualizar local');
+    }
     res.sendStatus(200);
   });
 });
 
 // Versão da API
 app.get('/api/version', (req, res) => {
-  res.json({ version: '1.0.0' }); // coloque a versão que quiser aqui
+  res.json({ version: '1.0.0' });
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-

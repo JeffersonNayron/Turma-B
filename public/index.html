@@ -56,7 +56,6 @@
 
           function formatarHora(hora) {
             if (!hora) return '-';
-            // Separa os segundos em span.segundos para controlar via CSS
             return hora.replace(/(\d{2}:\d{2})(:\d{2})/, "$1<span class='segundos'>$2</span>");
           }
 
@@ -68,7 +67,9 @@
             tr.innerHTML = `
               <td class="status">${p.status}</td>
               <td>${p.nome}</td>
-              <td class="${p.local === 'PIAL/OFC' ? 'local-pial-ofc' : ''}">${p.local}</td>
+              <td class="${p.local === 'PIAL/OFC' ? 'local-pial-ofc' : ''}">
+                <span class="local-display" onclick="editarLocal(this, ${p.id})">${p.local}</span>
+              </td>
               <td>${horaInicio}</td>
               <td>${horaFim}</td>
               <td class="actions">
@@ -113,38 +114,80 @@
       fetch('/limpar', { method: 'POST' }).then(carregarPessoas);
     }
 
+    // Função para editar o campo local inline
+    function editarLocal(span, id) {
+      const locais = ["X6", "X5", "PIAL/OFC", "VV"];
+      const currentLocal = span.textContent;
+
+      const select = document.createElement('select');
+      select.className = 'form-select form-select-sm';
+      locais.forEach(loc => {
+        const option = document.createElement('option');
+        option.value = loc;
+        option.textContent = loc;
+        if (loc === currentLocal) option.selected = true;
+        select.appendChild(option);
+      });
+
+      span.replaceWith(select);
+      select.focus();
+
+      select.onblur = () => {
+        const novoLocal = select.value;
+        fetch('/editarLocal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, local: novoLocal })
+        }).then(() => {
+          select.replaceWith(span);
+          span.textContent = novoLocal;
+          carregarPessoas();
+        }).catch(() => {
+          select.replaceWith(span);
+        });
+      };
+
+      select.onkeydown = e => {
+        if (e.key === 'Enter') {
+          select.blur();
+        }
+        if (e.key === 'Escape') {
+          select.replaceWith(span);
+        }
+      };
+    }
+
     carregarPessoas();
     setInterval(carregarPessoas, 5000);
-
   </script>
-  <script>
-  fetch('/api/version')
-    .then(res => {
-      if (!res.ok) throw new Error('Resposta não OK');
-      return res.json();
-    })
-    .then(data => {
-      const versionBadge = document.createElement('div');
-      versionBadge.textContent = `v${data.version}`;
-      Object.assign(versionBadge.style, {
-        position: 'fixed',
-        top: '6px',
-        right: '10px',
-        backgroundColor: '#888',
-        color: '#fff',
-        padding: '2px 6px',
-        fontSize: '12px',
-        borderRadius: '4px',
-        fontFamily: 'Arial, sans-serif',
-        zIndex: 9999,
-        opacity: '0.7',
-        cursor: 'default',
-        userSelect: 'none'
-      });
-      document.body.appendChild(versionBadge);
-    })
-    .catch(err => console.error('Erro ao obter versão:', err));
-</script>
 
+  <script>
+    fetch('/api/version')
+      .then(res => {
+        if (!res.ok) throw new Error('Resposta não OK');
+        return res.json();
+      })
+      .then(data => {
+        const versionBadge = document.createElement('div');
+        versionBadge.textContent = `v${data.version}`;
+        Object.assign(versionBadge.style, {
+          position: 'fixed',
+          top: '6px',
+          right: '10px',
+          backgroundColor: '#888',
+          color: '#fff',
+          padding: '2px 6px',
+          fontSize: '12px',
+          borderRadius: '4px',
+          fontFamily: 'Arial, sans-serif',
+          zIndex: 9999,
+          opacity: '0.7',
+          cursor: 'default',
+          userSelect: 'none'
+        });
+        document.body.appendChild(versionBadge);
+      })
+      .catch(err => console.error('Erro ao obter versão:', err));
+  </script>
 </body>
 </html>

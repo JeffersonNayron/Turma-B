@@ -2,12 +2,7 @@
   text-align: center;
 }
 
-/* Fora da media query, segundos aparecem */
-.segundos {
-  display: inline;
-}
-
-/* Responsividade 450px - segundos desaparecem */
+/* Responsividade 450px */
 @media (max-width: 450px) {
   .segundos {
     display: none;
