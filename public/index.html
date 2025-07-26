@@ -56,7 +56,19 @@
 
           function formatarHora(hora) {
             if (!hora) return '-';
-            return hora.replace(/(\d{2}:\d{2})(:\d{2})/, "$1<span class='segundos'>$2</span>");
+
+            // Remove AM/PM se houver
+            hora = hora.replace(/\s?(AM|PM)$/i, '');
+
+            // Divide e pega hora:minuto
+            let [hh, mm, ss] = hora.split(':');
+            let horaSemSegundos = `${hh}:${mm}`;
+
+            if (window.innerWidth > 450 && ss !== undefined) {
+              return `${horaSemSegundos}<span class='segundos'>:${ss}</span>`;
+            }
+
+            return horaSemSegundos;
           }
 
           data.forEach(p => {
@@ -114,7 +126,6 @@
       fetch('/limpar', { method: 'POST' }).then(carregarPessoas);
     }
 
-    // Função para editar o campo local inline
     function editarLocal(span, id) {
       const locais = ["X6", "X5", "PIAL/OFC", "VV"];
       const currentLocal = span.textContent;
