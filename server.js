@@ -110,7 +110,7 @@ app.get('/api/version', (req, res) => {
   res.json({ version: '1.0.0' });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
