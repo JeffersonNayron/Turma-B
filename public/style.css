@@ -1,0 +1,168 @@
+.logo {
+  text-align: center;
+}
+
+/* Fora da media query, segundos aparecem */
+.segundos {
+  display: inline;
+}
+
+/* Responsividade 450px - segundos desaparecem */
+@media (max-width: 450px) {
+  .segundos {
+    display: none;
+  }
+  td, th {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.4rem;
+  }
+  .btn-sm {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+  td.local-pial-ofc {
+    white-space: normal !important;
+    line-height: 1.1;
+  }
+  td.local-pial-ofc span {
+    display: block;
+    line-height: 1.1;
+  }
+  form#formPessoa {
+    flex-direction: column !important;
+    gap: 0.5rem;
+  }
+}
+
+/* Form alinhado no desktop */
+#formPessoa {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#formPessoa > * {
+  min-width: 150px;
+  flex-grow: 1;
+}
+#formPessoa button {
+  min-width: 130px;
+  flex-grow: 0;
+}
+
+/* Status emoji no centro */
+td.status {
+  font-size: 1.3rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Botões alinhados */
+td.actions > button {
+  min-width: 90px;
+  margin: 0 2px 4px 2px;
+}
+
+/* Cabeçalho dark */
+thead {
+  background-color: #212529;
+  color: white;
+}
+
+/* Linhas alternadas */
+tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
+tbody tr:nth-child(even) {
+  background-color: #e9ecef;
+}
+
+/* Local PIAL/OFC */
+.local-pial-ofc {
+  white-space: normal;
+  line-height: 1.1;
+}
+.local-pial-ofc span {
+  display: block;
+}
+
+/* Local editável */
+.local-display {
+  cursor: pointer;
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+/* Responsivo 428px */
+@media (max-width: 428px) {
+  form#formPessoa {
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+  }
+  form#formPessoa > * {
+    min-width: 100% !important;
+    flex-grow: 0 !important;
+  }
+  form#formPessoa button {
+    min-width: 100% !important;
+  }
+  td, th {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.3rem;
+  }
+  td.actions > button {
+    min-width: auto !important;
+    width: 100%;
+    margin: 2px 0 !important;
+  }
+  .local-pial-ofc {
+    white-space: normal !important;
+    line-height: 1.0 !important;
+  }
+  .local-pial-ofc span {
+    display: block;
+    line-height: 1.0 !important;
+    font-size: 0.8rem;
+  }
+}
+
+/* Responsivo 318px */
+@media (max-width: 318px) {
+  body.container {
+    padding-left: 0.3rem !important;
+    padding-right: 0.3rem !important;
+  }
+  td, th {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.25rem;
+  }
+  form#formPessoa > * {
+    font-size: 0.8rem !important;
+  }
+  form#formPessoa button {
+    font-size: 0.8rem !important;
+  }
+  h1 {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* Estilo do select */
+select#local {
+  text-align-last: center;
+  color: #0d6efd;
+  font-weight: 600;
+  border: 2px solid #0d6efd;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  background-color: #e7f1ff;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+select#local:hover,
+select#local:focus {
+  border-color: #084298;
+  background-color: #cfe2ff;
+  outline: none;
+  color: #084298;
+}
