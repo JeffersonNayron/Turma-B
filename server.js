@@ -22,9 +22,9 @@ db.serialize(() => {
   )`);
 });
 
-// Listar todas pessoas
+// Listar todas pessoas em ordem alfabética
 app.get('/pessoas', (req, res) => {
-  db.all("SELECT * FROM pessoas", [], (err, rows) => {
+  db.all("SELECT * FROM pessoas ORDER BY nome ASC", [], (err, rows) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao listar pessoas');
