@@ -22,8 +22,6 @@ db.serialize(() => {
   )`);
 });
 
-// Rotas
-
 // Listar todas pessoas
 app.get('/pessoas', (req, res) => {
   db.all("SELECT * FROM pessoas", [], (err, rows) => {
@@ -47,20 +45,20 @@ app.post('/adicionar', (req, res) => {
   });
 });
 
-// Iniciar pessoa - muda status e horários
+// Iniciar pessoa - muda status e horários com fuso correto
 app.post('/iniciar', (req, res) => {
   const { id } = req.body;
-  const inicio = new Date();
-  const fim = new Date(inicio.getTime() + 60000);
 
-  const horaInicio = inicio.toLocaleTimeString('pt-BR', {
+  const horaInicio = new Date().toLocaleTimeString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: false
   });
 
-  const horaFim = fim.toLocaleTimeString('pt-BR', {
+  const horaFim = new Date(Date.now() + 60000).toLocaleTimeString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -74,7 +72,7 @@ app.post('/iniciar', (req, res) => {
         return res.status(500).send('Erro ao iniciar pessoa');
       }
 
-      // Após 60 segundos, troca o status para 🟢
+      // Após 60 segundos, muda status para 🟢
       setTimeout(() => {
         db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
           if (e) console.error(e);
@@ -125,6 +123,7 @@ app.get('/api/version', (req, res) => {
   res.json({ version: '1.0.0' });
 });
 
+// Iniciar servidor
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
