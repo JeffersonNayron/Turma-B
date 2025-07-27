@@ -50,7 +50,7 @@ app.post('/iniciar', (req, res) => {
   const { id } = req.body;
 
   const inicio = new Date();
-  const fim = new Date(inicio.getTime() + 75 * 60000); // 1 hora e 15 minutos = 75 minutos
+  const fim = new Date(inicio.getTime() + 75 * 60000);
 
   const horaInicio = inicio.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
@@ -86,7 +86,7 @@ app.post('/iniciar', (req, res) => {
     });
 });
 
-// Editar horário manual
+// Editar horário manualmente via teclado
 app.post('/editarHorario', (req, res) => {
   const { id, campo, valor } = req.body;
 
@@ -96,30 +96,32 @@ app.post('/editarHorario', (req, res) => {
       return res.status(500).send('Erro ao editar horário');
     }
 
-    // Atualizar o status com base na hora atual
-    const agora = new Date();
+    // Recalcular status
     db.get("SELECT hora_inicio, hora_fim FROM pessoas WHERE id = ?", [id], (erro, row) => {
-      if (erro) {
-        console.error(erro);
-        return;
+      if (erro || !row || !row.hora_inicio || !row.hora_fim) return;
+
+      try {
+        const agora = new Date();
+
+        const [hI, mI] = row.hora_inicio.split(':').map(Number);
+        const [hF, mF] = row.hora_fim.split(':').map(Number);
+
+        const inicio = new Date();
+        inicio.setHours(hI, mI, 0, 0);
+
+        const fim = new Date();
+        fim.setHours(hF, mF, 0, 0);
+
+        let status = '🔴';
+        if (agora >= inicio && agora <= fim) status = '🟡';
+        else if (agora > fim) status = '🟢';
+
+        db.run("UPDATE pessoas SET status = ? WHERE id = ?", [status, id], (e2) => {
+          if (e2) console.error(e2);
+        });
+      } catch (e) {
+        console.error('Erro ao processar horário manual:', e);
       }
-
-      const [hI, mI] = row.hora_inicio.split(':').map(Number);
-      const [hF, mF] = row.hora_fim.split(':').map(Number);
-
-      const inicio = new Date();
-      inicio.setHours(hI, mI, 0);
-
-      const fim = new Date();
-      fim.setHours(hF, mF, 0);
-
-      let status = '🔴';
-      if (agora >= inicio && agora <= fim) status = '🟡';
-      else if (agora > fim) status = '🟢';
-
-      db.run("UPDATE pessoas SET status = ? WHERE id = ?", [status, id], (e2) => {
-        if (e2) console.error(e2);
-      });
     });
 
     res.sendStatus(200);
@@ -148,7 +150,7 @@ app.post('/limpar', (req, res) => {
   });
 });
 
-// Atualizar local
+// Editar local
 app.post('/editarLocal', (req, res) => {
   const { id, local } = req.body;
   db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
@@ -166,7 +168,7 @@ app.get('/api/version', (req, res) => {
 });
 
 // Iniciar servidor
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
