@@ -1,48 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sistema em Manutenção</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #202020, #2c3e50);
-      font-family: 'Roboto', sans-serif;
-      color: #fff;
+      background: linear-gradient(to right, #2c3e50, #34495e);
+      color: white;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
       text-align: center;
     }
 
     .container {
-      max-width: 600px;
-      padding: 20px;
-      border: 1px solid #444;
-      border-radius: 10px;
       background-color: rgba(0, 0, 0, 0.6);
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      border-radius: 15px;
+      padding: 40px 25px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      max-width: 500px;
+      width: 100%;
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { color: #ffffff; }
+      50% { color: #f1c40f; }
+      100% { color: #ffffff; }
     }
 
     p {
-      font-size: 1.2rem;
       color: #ccc;
+      font-size: 1.1rem;
+    }
+
+    .assinatura {
+      margin-top: 30px;
+      font-size: 0.95rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🛠️ Sistema em Manutenção</h1>
-    <p>Estamos realizando testes e melhorias. Por favor, volte em breve.</p>
+    <p>Estamos realizando testes e melhorias.<br>Por favor, volte em breve.</p>
+
+    <div class="assinatura">
+      <hr style="background-color: #888;">
+      <p><strong>Assinado, Jefferson Nayron</strong><br>🚂 Revezamento Turma B</p>
+    </div>
   </div>
+
+  <!-- Bootstrap Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Animação dinâmica extra (mensagem alternando) -->
+  <script>
+    const frases = [
+      "Sistema em Manutenção",
+      "Testes em andamento...",
+      "Volte em breve!",
+      "🛠️ Revezamento Turma B 🛠️"
+    ];
+
+    let index = 0;
+    setInterval(() => {
+      document.querySelector('h1').textContent = frases[index % frases.length];
+      index++;
+    }, 2500);
+  </script>
 </body>
 </html>
