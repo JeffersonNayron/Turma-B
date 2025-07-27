@@ -19,6 +19,10 @@
       margin-bottom: 1rem;
       font-weight: 500;
     }
+    .segundos {
+      color: #aaa;
+      font-size: 0.85em;
+    }
   </style>
 </head>
 
@@ -64,8 +68,6 @@
         .then(data => {
           const tbody = document.getElementById('tabelaCorpo');
           tbody.innerHTML = '';
-
-          // Atualiza contador de pessoas
           document.getElementById('contadorPessoas').textContent = data.length;
 
           function formatarHora(hora) {
@@ -74,23 +76,23 @@
           }
 
           data.forEach(p => {
-            const horaInicio = formatarHora(p.hora_inicio);
-            const horaFim = formatarHora(p.hora_fim);
-
             const tr = document.createElement('tr');
+
             tr.innerHTML = `
               <td class="status">${p.status}</td>
               <td>${p.nome}</td>
               <td class="${p.local === 'PIAL/OFC' ? 'local-pial-ofc' : ''}">
                 <span class="local-display" onclick="editarLocal(this, ${p.id})">${p.local}</span>
               </td>
-              <td>${horaInicio}</td>
-              <td>${horaFim}</td>
+              <td id="inicio-${p.id}">${formatarHora(p.hora_inicio)}</td>
+              <td id="fim-${p.id}">${formatarHora(p.hora_fim)}</td>
               <td class="actions">
                 <button class="btn btn-warning btn-sm" onclick="iniciar(${p.id})">Iniciar</button>
                 <button class="btn btn-danger btn-sm" onclick="excluir(${p.id})">Excluir</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="editarHorario(${p.id}, '${p.hora_inicio || ''}', '${p.hora_fim || ''}')">Editar Horário</button>
               </td>
             `;
+
             tbody.appendChild(tr);
           });
         });
@@ -128,13 +130,12 @@
       fetch('/limpar', { method: 'POST' }).then(carregarPessoas);
     }
 
-    // Função para editar o campo local inline
     function editarLocal(span, id) {
       const locais = ["X6", "X5", "PIAL/OFC", "VV"];
       const currentLocal = span.textContent;
-
       const select = document.createElement('select');
       select.className = 'form-select form-select-sm';
+
       locais.forEach(loc => {
         const option = document.createElement('option');
         option.value = loc;
@@ -162,13 +163,35 @@
       };
 
       select.onkeydown = e => {
-        if (e.key === 'Enter') {
-          select.blur();
-        }
-        if (e.key === 'Escape') {
-          select.replaceWith(span);
-        }
+        if (e.key === 'Enter') select.blur();
+        if (e.key === 'Escape') select.replaceWith(span);
       };
+    }
+
+    function editarHorario(id, horaInicioAtual = '', horaFimAtual = '') {
+      const tdInicio = document.getElementById(`inicio-${id}`);
+      const tdFim = document.getElementById(`fim-${id}`);
+
+      tdInicio.innerHTML = `<input type="time" class="form-control form-control-sm" id="input-inicio-${id}" value="${horaInicioAtual.slice(0,5)}">`;
+      tdFim.innerHTML = `<input type="time" class="form-control form-control-sm" id="input-fim-${id}" value="${horaFimAtual.slice(0,5)}">`;
+
+      const salvarBtn = document.createElement('button');
+      salvarBtn.textContent = 'Salvar Horário';
+      salvarBtn.className = 'btn btn-primary btn-sm mt-2';
+      salvarBtn.onclick = () => {
+        const hora_inicio = document.getElementById(`input-inicio-${id}`).value + ':00';
+        const hora_fim = document.getElementById(`input-fim-${id}`).value + ':00';
+
+        fetch('/editarHorario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, hora_inicio, hora_fim })
+        }).then(() => {
+          carregarPessoas();
+        });
+      };
+
+      tdFim.appendChild(salvarBtn);
     }
 
     carregarPessoas();
