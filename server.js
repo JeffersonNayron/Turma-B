@@ -88,6 +88,40 @@ app.post('/iniciar', (req, res) => {
   );
 });
 
+// Editar horário manualmente e ajustar status de acordo com o tempo real
+app.post('/editarHorario', (req, res) => {
+  const { id, hora_inicio, hora_fim } = req.body;
+
+  const agora = new Date();
+
+  // Converter HH:mm:ss para Date de hoje
+  const [h1, m1, s1] = hora_inicio.split(':').map(Number);
+  const [h2, m2, s2] = hora_fim.split(':').map(Number);
+
+  const inicio = new Date();
+  inicio.setHours(h1, m1, s1, 0);
+
+  const fim = new Date();
+  fim.setHours(h2, m2, s2, 0);
+
+  let status = '🔴';
+  if (agora >= fim) {
+    status = '🟢';
+  } else if (agora >= inicio && agora < fim) {
+    status = '🟡';
+  }
+
+  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
+    [hora_inicio, hora_fim, status, id], (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erro ao editar horário');
+      }
+      res.sendStatus(200);
+    }
+  );
+});
+
 // Excluir pessoa
 app.post('/excluir', (req, res) => {
   db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {
