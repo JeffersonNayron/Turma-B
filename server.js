@@ -45,11 +45,14 @@ app.post('/adicionar', (req, res) => {
   });
 });
 
-// Iniciar pessoa (1 hora e 15 minutos)
+// Iniciar pessoa (1h15min)
 app.post('/iniciar', (req, res) => {
   const { id } = req.body;
 
-  const horaInicio = new Date().toLocaleTimeString('pt-BR', {
+  const inicio = new Date();
+  const fim = new Date(inicio.getTime() + 75 * 60000);
+
+  const horaInicio = inicio.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
     minute: '2-digit',
@@ -57,7 +60,7 @@ app.post('/iniciar', (req, res) => {
     hour12: false
   });
 
-  const horaFim = new Date(Date.now() + (75 * 60 * 1000)).toLocaleTimeString('pt-BR', {
+  const horaFim = fim.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
     minute: '2-digit',
@@ -72,67 +75,55 @@ app.post('/iniciar', (req, res) => {
         return res.status(500).send('Erro ao iniciar pessoa');
       }
 
-      // Muda status para 🟢 após 1h15
+      // Muda para 🟢 após 1h15
       setTimeout(() => {
         db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
           if (e) console.error(e);
         });
-      }, 75 * 60 * 1000);
+      }, 75 * 60000);
 
       res.sendStatus(200);
     });
 });
 
-// Atualizar local (edição inline)
-app.post('/editarLocal', (req, res) => {
-  const { id, local } = req.body;
-  db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
+// Editar horário manual
+app.post('/editarHorario', (req, res) => {
+  const { id, campo, valor } = req.body;
+
+  db.run(`UPDATE pessoas SET ${campo} = ? WHERE id = ?`, [valor, id], (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Erro ao atualizar local');
+      return res.status(500).send('Erro ao editar horário');
     }
+
+    // Atualizar o status com base na hora atual
+    const agora = new Date();
+    db.get("SELECT hora_inicio, hora_fim FROM pessoas WHERE id = ?", [id], (erro, row) => {
+      if (erro) {
+        console.error(erro);
+        return;
+      }
+
+      const [hI, mI] = row.hora_inicio.split(':').map(Number);
+      const [hF, mF] = row.hora_fim.split(':').map(Number);
+
+      const inicio = new Date();
+      inicio.setHours(hI, mI, 0);
+
+      const fim = new Date();
+      fim.setHours(hF, mF, 0);
+
+      let status = '🔴';
+      if (agora >= inicio && agora <= fim) status = '🟡';
+      else if (agora > fim) status = '🟢';
+
+      db.run("UPDATE pessoas SET status = ? WHERE id = ?", [status, id], (e2) => {
+        if (e2) console.error(e2);
+      });
+    });
+
     res.sendStatus(200);
   });
-});
-
-// Atualizar horas manualmente e ajustar status
-app.post('/editarHorario', (req, res) => {
-  const { id, hora_inicio, hora_fim } = req.body;
-
-  // Pegar horário atual em 'HH:mm:ss'
-  const agora = new Date().toLocaleTimeString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  });
-
-  // Função para comparar horas no formato HH:mm:ss
-  function compararHoras(atual, inicio, fim) {
-    const [ha, ma, sa] = atual.split(':').map(Number);
-    const [hi, mi, si] = inicio.split(':').map(Number);
-    const [hf, mf, sf] = fim.split(':').map(Number);
-
-    const tAtual = ha * 3600 + ma * 60 + sa;
-    const tInicio = hi * 3600 + mi * 60 + si;
-    const tFim = hf * 3600 + mf * 60 + sf;
-
-    if (tAtual < tInicio) return '🔴';
-    if (tAtual >= tInicio && tAtual < tFim) return '🟡';
-    return '🟢';
-  }
-
-  const novoStatus = compararHoras(agora, hora_inicio, hora_fim);
-
-  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
-    [hora_inicio, hora_fim, novoStatus, id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Erro ao editar horários');
-      }
-      res.sendStatus(200);
-    });
 });
 
 // Excluir pessoa
@@ -146,12 +137,24 @@ app.post('/excluir', (req, res) => {
   });
 });
 
-// Limpar todos dados
+// Limpar dados
 app.post('/limpar', (req, res) => {
   db.run("DELETE FROM pessoas", (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao limpar dados');
+    }
+    res.sendStatus(200);
+  });
+});
+
+// Atualizar local
+app.post('/editarLocal', (req, res) => {
+  const { id, local } = req.body;
+  db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao atualizar local');
     }
     res.sendStatus(200);
   });
