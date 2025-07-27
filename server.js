@@ -45,14 +45,12 @@ app.post('/adicionar', (req, res) => {
   });
 });
 
-// Iniciar pessoa (1h15min)
+// Iniciar pessoa
 app.post('/iniciar', (req, res) => {
   const { id } = req.body;
 
-  const inicio = new Date();
-  const fim = new Date(inicio.getTime() + 75 * 60000);
-
-  const horaInicio = inicio.toLocaleTimeString('pt-BR', {
+  const agora = new Date();
+  const horaInicio = agora.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
     minute: '2-digit',
@@ -60,6 +58,7 @@ app.post('/iniciar', (req, res) => {
     hour12: false
   });
 
+  const fim = new Date(agora.getTime() + 75 * 60000); // 1 hora e 15 min
   const horaFim = fim.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     hour: '2-digit',
@@ -75,55 +74,39 @@ app.post('/iniciar', (req, res) => {
         return res.status(500).send('Erro ao iniciar pessoa');
       }
 
-      // Muda para 🟢 após 1h15
       setTimeout(() => {
         db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
           if (e) console.error(e);
         });
-      }, 75 * 60000);
+      }, 75 * 60000); // 1h15min
 
       res.sendStatus(200);
     });
 });
 
-// Editar horário manualmente via teclado
+// Atualizar horários manualmente
 app.post('/editarHorario', (req, res) => {
   const { id, campo, valor } = req.body;
 
-  db.run(`UPDATE pessoas SET ${campo} = ? WHERE id = ?`, [valor, id], (err) => {
+  let status = '🟡';
+  const horaAtual = new Date();
+  const partes = valor.split(':');
+  if (partes.length === 3) {
+    const editada = new Date();
+    editada.setHours(parseInt(partes[0]));
+    editada.setMinutes(parseInt(partes[1]));
+    editada.setSeconds(parseInt(partes[2]));
+
+    if (editada < horaAtual) {
+      status = '🟢';
+    }
+  }
+
+  db.run(`UPDATE pessoas SET ${campo} = ?, status = ? WHERE id = ?`, [valor, status, id], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao editar horário');
     }
-
-    // Recalcular status
-    db.get("SELECT hora_inicio, hora_fim FROM pessoas WHERE id = ?", [id], (erro, row) => {
-      if (erro || !row || !row.hora_inicio || !row.hora_fim) return;
-
-      try {
-        const agora = new Date();
-
-        const [hI, mI] = row.hora_inicio.split(':').map(Number);
-        const [hF, mF] = row.hora_fim.split(':').map(Number);
-
-        const inicio = new Date();
-        inicio.setHours(hI, mI, 0, 0);
-
-        const fim = new Date();
-        fim.setHours(hF, mF, 0, 0);
-
-        let status = '🔴';
-        if (agora >= inicio && agora <= fim) status = '🟡';
-        else if (agora > fim) status = '🟢';
-
-        db.run("UPDATE pessoas SET status = ? WHERE id = ?", [status, id], (e2) => {
-          if (e2) console.error(e2);
-        });
-      } catch (e) {
-        console.error('Erro ao processar horário manual:', e);
-      }
-    });
-
     res.sendStatus(200);
   });
 });
@@ -150,7 +133,7 @@ app.post('/limpar', (req, res) => {
   });
 });
 
-// Editar local
+// Atualizar local
 app.post('/editarLocal', (req, res) => {
   const { id, local } = req.body;
   db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
@@ -168,7 +151,7 @@ app.get('/api/version', (req, res) => {
 });
 
 // Iniciar servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
