@@ -50,7 +50,7 @@ app.post('/iniciar', (req, res) => {
   const { id } = req.body;
 
   const inicio = new Date();
-  const fim = new Date(inicio.getTime() + 75 * 60000);
+  const fim = new Date(inicio.getTime() + 75 * 60000); // 1 hora e 15 minutos = 75 minutos
 
   const horaInicio = inicio.toLocaleTimeString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
