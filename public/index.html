@@ -1,99 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🚂 Revezamento - Manutenção</title>
-  <style>
-    body {
-      background: #1e1e1e;
-      color: #eee;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      padding: 2rem;
-      overflow-x: hidden;
-    }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 3rem;
-      color: #bbb;
-    }
-
-    /* Relógio */
-    #clock {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 4rem;
-      font-family: monospace;
-      letter-spacing: 2px;
-    }
-
-    /* Trem container e animação */
-    #train-container {
-      position: relative;
-      width: 100vw;
-      height: 120px;
-      overflow: hidden;
-      margin: 0 auto;
-      max-width: 600px;
-    }
-    #train {
-      position: absolute;
-      left: -200px;
-      top: 10px;
-      width: 180px;
-      animation: moveTrain 8s linear infinite;
-    }
-
-    @keyframes moveTrain {
-      0% {
-        left: -200px;
-      }
-      100% {
-        left: 100vw;
-      }
-    }
-
-    /* Desenho simples do trem usando SVG */
-    svg {
-      width: 180px;
-      height: 100px;
-      fill: #ff4c00;
-      stroke: #222;
-      stroke-width: 3px;
-      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
-    }
-  </style>
-</head>
 <body>
   <h1>🚂 Revezamento</h1>
   <p>Olá, estamos em manutenção no momento. Volte em breve!</p>
-  <p></p>
 
   <div id="clock">--:--:--</div>
 
   <div id="train-container">
     <div id="train">
-      <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" aria-label="Trem">
-        <rect x="10" y="20" width="60" height="20" rx="4" ry="4" />
-        <rect x="70" y="10" width="20" height="30" rx="3" ry="3" />
-        <circle cx="25" cy="45" r="7" fill="#222" />
-        <circle cx="65" cy="45" r="7" fill="#222" />
-        <circle cx="80" cy="45" r="7" fill="#222" />
-        <rect x="15" y="10" width="15" height="15" fill="#222" />
-        <rect x="35" y="10" width="20" height="10" fill="#222" />
-      </svg>
+      <!-- seu SVG do trem -->
     </div>
   </div>
-  <audio autoplay loop>
-  <source src="../Madonna - La Isla Bonita (Official Video).mp3" type="audio/mpeg" />
-  Seu navegador não suporta o elemento de áudio.
-</audio>
 
+  <button id="playBtn" style="margin-top: 20px;"></button>
+
+  <audio id="audio" loop>
+    <source src="musica.mp3" type="audio/mpeg" />
+  </audio>
 
   <script>
     function atualizarRelogio() {
@@ -105,6 +26,10 @@
     }
     atualizarRelogio();
     setInterval(atualizarRelogio, 1000);
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      const audio = document.getElementById('audio');
+      audio.play();
+    });
   </script>
 </body>
-</html>
