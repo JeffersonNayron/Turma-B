@@ -170,3 +170,22 @@ select#local:focus {
   font-weight: 500;
 }
 
+.quantidade-equipes {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: -0.3rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.segundos {
+  color: #aaa;
+  font-size: 0.85em;
+}
+
+.local-pial-ofc {
+  font-weight: 600;
+  color: #007bff;
+  /* Customize como quiser */
+}
