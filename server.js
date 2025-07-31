@@ -82,7 +82,7 @@ function verificarAdmin(req, res, next) {
   }
 }
 
-// Definição das rotas
+// Definição das rotas - já fora do callback!
 function definirRotas() {
 
   // Login
@@ -126,8 +126,8 @@ function definirRotas() {
     });
   });
 
-  // Adicionar pessoa (admin)
-  app.post('/adicionar', verificarAdmin, (req, res) => {
+  // Adicionar pessoa (**SEM proteção admin**)
+  app.post('/adicionar', (req, res) => {
     const { nome, local } = req.body;
     db.run("INSERT INTO pessoas (nome, local) VALUES (?, ?)", [nome, local], (err) => {
       if (err) {
@@ -138,8 +138,8 @@ function definirRotas() {
     });
   });
 
-  // Iniciar pessoa (admin)
-  app.post('/iniciar', verificarAdmin, (req, res) => {
+  // Iniciar pessoa (**SEM proteção admin**)
+  app.post('/iniciar', (req, res) => {
     const { id } = req.body;
     const agora = new Date();
     const horaInicio = agora.toLocaleTimeString('pt-BR', {
@@ -172,8 +172,8 @@ function definirRotas() {
       });
   });
 
-  // Editar horário (admin)
-  app.post('/editarHorario', verificarAdmin, (req, res) => {
+  // Editar horário (**SEM proteção admin**)
+  app.post('/editarHorario', (req, res) => {
     const { id, hora_inicio } = req.body;
     if (!id || !hora_inicio) {
       return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
@@ -201,8 +201,8 @@ function definirRotas() {
       });
   });
 
-  // Excluir pessoa (admin)
-  app.post('/excluir', verificarAdmin, (req, res) => {
+  // Excluir pessoa (**SEM proteção admin**)
+  app.post('/excluir', (req, res) => {
     db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {
       if (err) {
         console.error(err);
@@ -212,8 +212,8 @@ function definirRotas() {
     });
   });
 
-  // Limpar dados (admin)
-  app.post('/limpar', verificarAdmin, (req, res) => {
+  // Limpar dados (**SEM proteção admin**)
+  app.post('/limpar', (req, res) => {
     const sql = `
       UPDATE pessoas 
       SET status = '🔴',
@@ -230,8 +230,8 @@ function definirRotas() {
     });
   });
 
-  // Editar local (admin)
-  app.post('/editarLocal', verificarAdmin, (req, res) => {
+  // Editar local (**SEM proteção admin**)
+  app.post('/editarLocal', (req, res) => {
     const { id, local } = req.body;
     db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
       if (err) {
@@ -242,7 +242,7 @@ function definirRotas() {
     });
   });
 
-  // Enviar mensagem (admin) - PROTEGIDO COM SESSÃO
+  // Enviar mensagem (SOMENTE ADMIN)
   app.post('/enviarMensagem', verificarAdmin, (req, res) => {
     const { id, mensagem } = req.body;
     if (!id || typeof mensagem !== 'string') {
