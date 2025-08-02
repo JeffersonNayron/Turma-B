@@ -173,62 +173,44 @@ function definirRotas() {
   });
 
   // Editar horário (**SEM proteção admin**)
-  app.post('/editarHorario', (req, res) => {
-    const { id, hora_inicio } = req.body;
-    if (!id || !hora_inicio) {
-      return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
-    }
-    if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
-      return res.status(400).json({ erro: 'hora_inicio inválida' });
-    }
-    const [h, m, s] = hora_inicio.split(':').map(Number);
-    let dateInicio = new Date();
-    dateInicio.setHours(h, m, s, 0);
-    let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
-    const pad = n => n.toString().padStart(2, '0');
-    const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
-    const agora = new Date();
-    let status = '🟡';
-    if (dateFim < agora) status = '🟢';
-    else if (dateInicio > agora) status = '🔴';
-    db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
-      [hora_inicio, horaFim, status, id], (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ erro: 'Erro ao atualizar horário' });
-        }
-        res.sendStatus(200);
-      });
-  });
+app.post('/editarHorario', (req, res) => {
+  const { id, hora_inicio } = req.body;
+  if (!id || !hora_inicio) {
+    return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
+  }
+  if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
+    return res.status(400).json({ erro: 'hora_inicio inválida' });
+  }
 
-  // Excluir pessoa (**SEM proteção admin**)
-  app.post('/excluir', (req, res) => {
-    db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {
+  const [h, m, s] = hora_inicio.split(':').map(Number);
+  let dateInicio = new Date();
+  dateInicio.setHours(h, m, s, 0);
+  let dateFim = new Date(dateInicio.getTime() + 75 * 60000); // +75 minutos
+
+  const pad = n => n.toString().padStart(2, '0');
+  const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
+  const agora = new Date();
+  
+  let status = '🟡'; // status inicial é "🟡" (iniciado)
+  
+  // Se a hora de fim já passou
+  if (dateFim < agora) {
+    status = '🟢'; // Tarefa finalizada
+  }
+  // Se a hora de início ainda não chegou
+  else if (dateInicio > agora) {
+    status = '🔴'; // Tarefa pendente
+  }
+  
+  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
+    [hora_inicio, horaFim, status, id], (err) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ erro: 'Erro ao excluir pessoa' });
+        return res.status(500).json({ erro: 'Erro ao atualizar horário' });
       }
       res.sendStatus(200);
     });
-  });
-
-  // Limpar dados (**SEM proteção admin**)
-  app.post('/limpar', (req, res) => {
-    const sql = `
-      UPDATE pessoas 
-      SET status = '🔴',
-          hora_inicio = NULL,
-          hora_fim = NULL,
-          mensagem = NULL
-    `;
-    db.run(sql, function(err) {
-      if (err) {
-        console.error('Erro ao limpar dados:', err.message);
-        return res.status(500).send('Erro ao limpar dados');
-      }
-      res.sendStatus(200);
-    });
-  });
+});
 
   // Editar local (**SEM proteção admin**)
   app.post('/editarLocal', (req, res) => {
