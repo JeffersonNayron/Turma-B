@@ -172,65 +172,34 @@ function definirRotas() {
       });
   });
 
-  function editarHoraInicio(td, id, horaAtual) {
-  estaEditandoId = id;
-  const valorInput = horaAtual.length >= 5 ? horaAtual.slice(0,5) : '';
-  const input = document.createElement('input');
-  input.type = 'time';
-  input.className = 'form-control form-control-sm';
-  input.value = valorInput;
-  input.style.maxWidth = '110px';
-  td.innerHTML = '';
-  td.appendChild(input);
-  input.focus();
-
-  function salvar() {
-    if (!input.value) return cancelar();
-    const [h, m] = input.value.split(':');
-    if(h === undefined || m === undefined) return cancelar();
-
-    const dtInicio = new Date();
-    dtInicio.setHours(parseInt(h), parseInt(m), 0, 0);
-    const dtFim = new Date(dtInicio.getTime() + 75*60000);
-    const hhFim = dtFim.getHours().toString().padStart(2,'0');
-    const mmFim = dtFim.getMinutes().toString().padStart(2,'0');
-    const ssFim = '00';
-
-    const hora_inicio = `${input.value}:00`;
-    const hora_fim = `${hhFim}:${mmFim}:${ssFim}`;
-
-    // Realiza a atualização do horário sem afetar o status
-    fetch('/editarHorario', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id, hora_inicio, hora_fim })
-    }).then(() => {
-      estaEditandoId = null;
-      carregarPessoas();  // Recarrega os dados da tabela, incluindo o status correto
-    }).catch(() => {
-      estaEditandoId = null;
-      carregarPessoas();  // Em caso de erro, recarrega e mantém o status correto
-    });
-  }
-
-  function cancelar() {
-    estaEditandoId = null;
-    carregarPessoas();  // Recarrega os dados da tabela, mantendo o status
-  }
-
-  input.onblur = () => salvar();
-  input.onkeydown = (e) => {
-    if(e.key === 'Enter') {
-      e.preventDefault();
-      salvar();
+  // Editar horário (**SEM proteção admin**)
+  app.post('/editarHorario', (req, res) => {
+    const { id, hora_inicio } = req.body;
+    if (!id || !hora_inicio) {
+      return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
     }
-    if(e.key === 'Escape') {
-      e.preventDefault();
-      cancelar();
+    if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
+      return res.status(400).json({ erro: 'hora_inicio inválida' });
     }
-  };
-}
-
+    const [h, m, s] = hora_inicio.split(':').map(Number);
+    let dateInicio = new Date();
+    dateInicio.setHours(h, m, s, 0);
+    let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
+    const pad = n => n.toString().padStart(2, '0');
+    const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
+    const agora = new Date();
+    let status = '🟡';
+    if (dateFim < agora) status = '🟢';
+    else if (dateInicio > agora) status = '🔴';
+    db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
+      [hora_inicio, horaFim, status, id], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ erro: 'Erro ao atualizar horário' });
+        }
+        res.sendStatus(200);
+      });
+  });
 
   // Excluir pessoa (**SEM proteção admin**)
   app.post('/excluir', (req, res) => {
@@ -311,5 +280,5 @@ async function inicializar() {
     process.exit(1);
   }
 }
-
+//iniciar
 inicializar();
