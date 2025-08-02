@@ -142,52 +142,71 @@ function definirRotas() {
 app.post('/editarHorario', (req, res) => {
   const { id, hora_inicio } = req.body;
   
-  // Validar a entrada
+  // Verificar se as variáveis id e hora_inicio foram passadas corretamente
   if (!id || !hora_inicio) {
     return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
   }
+
+  // Verificar se a hora_inicio é válida no formato HH:mm:ss
   if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
     return res.status(400).json({ erro: 'hora_inicio inválida' });
   }
 
-  // Converter hora_inicio para Date
+  // Converter hora_inicio para um objeto Date
   const [h, m, s] = hora_inicio.split(':').map(Number);
   let dateInicio = new Date();
   dateInicio.setHours(h, m, s, 0);
 
-  // Calcular a hora de fim (75 minutos depois)
+  // Calcular a hora de fim (75 minutos após a hora de início)
   let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
   const pad = n => n.toString().padStart(2, '0');
   const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
 
-  // Hora atual para comparar
+  // Obter a hora atual para definir o status corretamente
   const agora = new Date();
   
-  // Determinar o status com base no horário de início e fim
-  let status = '🟡'; // "Em andamento" por padrão
+  // Definir o status baseado no horário de início e o tempo atual
+  let status = '🟡'; // Em andamento, por padrão
   
-  // Verifica se a hora de início já passou, mas não a de fim
+  // Se o horário de início já passou, mas o de fim ainda não
   if (dateInicio <= agora && dateFim >= agora) {
-    status = '🟡'; // "Em andamento" se a hora de início passou mas a de fim ainda não
+    status = '🟡'; // Em andamento
   }
-  // Se a hora de fim já passou
+  // Se o horário de fim já passou
   else if (dateFim < agora) {
-    status = '🟢'; // "Finalizado" caso a hora de fim tenha passado
+    status = '🟢'; // Finalizado
   }
-  // Se a hora de início ainda não chegou
+  // Se o horário de início ainda não chegou
   else if (dateInicio > agora) {
-    status = '🔴'; // "Pendende" caso a hora de início ainda não tenha chegado
+    status = '🔴'; // Pendente
   }
 
-  // Atualizar banco de dados com a nova hora de início e fim
+  // Atualizar as informações no banco de dados
   db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
     [hora_inicio, horaFim, status, id], (err) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ erro: 'Erro ao atualizar horário' });
       }
-      res.sendStatus(200); // Responde com sucesso
+      res.sendStatus(200); // Retornar sucesso
     });
+});
+
+// Função para iniciar (alterar o status da pessoa)
+app.post('/iniciar', (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(400).json({ erro: 'id é obrigatório' });
+  }
+
+  // Atualizar status para "🟡" (Em andamento)
+  db.run("UPDATE pessoas SET status = '🟡' WHERE id = ?", [id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ erro: 'Erro ao iniciar' });
+    }
+    res.sendStatus(200); // Retornar sucesso
+  });
 });
 
 
