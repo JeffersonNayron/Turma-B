@@ -138,77 +138,68 @@ function definirRotas() {
     });
   });
 
- // Editar horário (**SEM proteção admin**)
-app.post('/editarHorario', (req, res) => {
-  const { id, hora_inicio } = req.body;
-  
-  // Verificar se as variáveis id e hora_inicio foram passadas corretamente
-  if (!id || !hora_inicio) {
-    return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
-  }
-
-  // Verificar se a hora_inicio é válida no formato HH:mm:ss
-  if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
-    return res.status(400).json({ erro: 'hora_inicio inválida' });
-  }
-
-  // Converter hora_inicio para um objeto Date
-  const [h, m, s] = hora_inicio.split(':').map(Number);
-  let dateInicio = new Date();
-  dateInicio.setHours(h, m, s, 0);
-
-  // Calcular a hora de fim (75 minutos após a hora de início)
-  let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
-  const pad = n => n.toString().padStart(2, '0');
-  const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
-
-  // Obter a hora atual para definir o status corretamente
-  const agora = new Date();
-  
-  // Definir o status baseado no horário de início e o tempo atual
-  let status = '🟡'; // Em andamento, por padrão
-  
-  // Se o horário de início já passou, mas o de fim ainda não
-  if (dateInicio <= agora && dateFim >= agora) {
-    status = '🟡'; // Em andamento
-  }
-  // Se o horário de fim já passou
-  else if (dateFim < agora) {
-    status = '🟢'; // Finalizado
-  }
-  // Se o horário de início ainda não chegou
-  else if (dateInicio > agora) {
-    status = '🔴'; // Pendente
-  }
-
-  // Atualizar as informações no banco de dados
-  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
-    [hora_inicio, horaFim, status, id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao atualizar horário' });
-      }
-      res.sendStatus(200); // Retornar sucesso
+  // Iniciar pessoa (**SEM proteção admin**)
+  app.post('/iniciar', (req, res) => {
+    const { id } = req.body;
+    const agora = new Date();
+    const horaInicio = agora.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
     });
-});
-
-// Função para iniciar (alterar o status da pessoa)
-app.post('/iniciar', (req, res) => {
-  const { id } = req.body;
-  if (!id) {
-    return res.status(400).json({ erro: 'id é obrigatório' });
-  }
-
-  // Atualizar status para "🟡" (Em andamento)
-  db.run("UPDATE pessoas SET status = '🟡' WHERE id = ?", [id], (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ erro: 'Erro ao iniciar' });
-    }
-    res.sendStatus(200); // Retornar sucesso
+    const fim = new Date(agora.getTime() + 75 * 60000);
+    const horaFim = fim.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
+      ['🟡', horaInicio, horaFim, id], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ erro: 'Erro ao iniciar pessoa' });
+        }
+        setTimeout(() => {
+          db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
+            if (e) console.error(e);
+          });
+        }, 75 * 60000);
+        res.sendStatus(200);
+      });
   });
-});
 
+  // Editar horário (**SEM proteção admin**)
+  app.post('/editarHorario', (req, res) => {
+    const { id, hora_inicio } = req.body;
+    if (!id || !hora_inicio) {
+      return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
+    }
+    if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
+      return res.status(400).json({ erro: 'hora_inicio inválida' });
+    }
+    const [h, m, s] = hora_inicio.split(':').map(Number);
+    let dateInicio = new Date();
+    dateInicio.setHours(h, m, s, 0);
+    let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
+    const pad = n => n.toString().padStart(2, '0');
+    const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
+    const agora = new Date();
+    let status = '🟡';
+    if (dateFim < agora) status = '🟢';
+    else if (dateInicio > agora) status = '🔴';
+    db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
+      [hora_inicio, horaFim, status, id], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ erro: 'Erro ao atualizar horário' });
+        }
+        res.sendStatus(200);
+      });
+  });
 
   // Excluir pessoa (**SEM proteção admin**)
   app.post('/excluir', (req, res) => {
