@@ -4,113 +4,114 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login - Revezamento Turma B</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
+    /* Estilos Globais */
     body {
-      background: #e0f7fa;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928DAB);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 1rem;
       margin: 0;
+      color: #fff;
       text-align: center;
     }
+
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.3rem;
-    }
-    .trem {
-      font-size: 4.5rem;
-      animation: moverTrem 3s linear infinite;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #fff;
       margin-bottom: 1.5rem;
-      user-select: none;
-    }
-    @keyframes moverTrem {
-      0% { transform: translateX(-80px); }
-      50% { transform: translateX(40px); }
-      100% { transform: translateX(-80px); }
-    }
-    .btn-login {
-      width: 180px;
-      margin: 0.5rem auto;
-      font-size: 1rem;
-      padding: 0.5rem 0;
-      display: block;
-    }
-    #loginAdminForm {
-      max-width: 320px;
-      width: 100%;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
-      display: none;
-      margin-top: 1rem;
-    }
-    #loginAdminForm label {
-      font-weight: 600;
-    }
-    #loginAdminForm input {
-      font-size: 1rem;
-    }
-    #loginError {
-      font-size: 0.9rem;
-    }
-    /* Responsividade extra */
-    @media (max-width: 450px) {
-      h1 {
-        font-size: 28px;
-      }
-      .trem {
-        font-size: 3.5rem;
-      }
-      .btn-login {
-        width: 140px;
-        font-size: 0.9rem;
-      }
-      #loginAdminForm {
-        max-width: 260px;
-        padding: 0.8rem;
-      }
     }
 
-    /* Estilo para manutenção */
-    .maintenance {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 2rem;
-      font-weight: bold;
+    .btn-login {
+      font-size: 1.1rem;
+      padding: 12px 30px;
+      border-radius: 30px;
+      margin: 10px;
+      width: auto;
+      transition: background-color 0.3s ease;
     }
-    .hidden {
+
+    .btn-login:hover {
+      background-color: #f15bb5;
+      border-color: #f15bb5;
+    }
+
+    #loginAdminForm {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 360px;
+      width: 100%;
+      margin-top: 1.5rem;
       display: none;
+      transition: opacity 0.4s ease;
+    }
+
+    #loginAdminForm label {
+      font-weight: 500;
+      color: #ccc;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    #loginAdminForm input {
+      font-size: 1rem;
+      padding: 12px;
+      border-radius: 8px;
+      width: 100%;
+      border: none;
+      margin-bottom: 15px;
+      background: #333;
+      color: #fff;
+      box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #loginAdminForm input:focus {
+      background: #444;
+      outline: none;
+    }
+
+    #loginError {
+      color: #ff4d4d;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .btn-login {
+        font-size: 1rem;
+        padding: 10px 25px;
+      }
+
+      #loginAdminForm {
+        padding: 1.5rem;
+        max-width: 280px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Tela de Manutenção -->
-  <div class="maintenance">
-    A página está em manutenção. Volte logo!
-  </div>
+  <div>
+    <h1>Revezamento Turma B</h1>
 
-  <!-- Conteúdo Ocultado -->
-  <div class="hidden" id="content">
-    <h1>🚂 Revezamento Turma B</h1>
-    <div class="trem">🚂🚃🚃</div>
+    <div class="d-flex justify-content-center">
+      <button id="btnAdm" class="btn btn-login btn-outline-light">Entrar como ADM</button>
+      <button id="btnUser" class="btn btn-login btn-outline-info">Entrar Normal</button>
+    </div>
 
-    <button id="btnAdm" class="btn btn-primary btn-login">Entrar como ADM</button>
-    <button id="btnUser" class="btn btn-success btn-login">Entrar Normal</button>
-    <button id="btnLogout" class="btn btn-danger btn-login" style="display:none;">Logout</button>
+    <button id="btnLogout" class="btn btn-login btn-outline-danger" style="display:none;">Logout</button>
 
     <form id="loginAdminForm" class="mt-3" autocomplete="off">
       <div class="mb-3">
@@ -122,16 +123,94 @@
     </form>
   </div>
 
-<script>
-  // Aqui, se quiser adicionar funcionalidades dinâmicas enquanto a manutenção estiver ativa, pode ajustar o comportamento.
-  // Por exemplo, desabilitar botões ou outras interações.
+  <script>
+    const btnAdm = document.getElementById('btnAdm');
+    const btnUser = document.getElementById('btnUser');
+    const btnLogout = document.getElementById('btnLogout');
+    const loginAdminForm = document.getElementById('loginAdminForm');
+    const loginError = document.getElementById('loginError');
 
-  // Por enquanto, todos os botões estão ocultos e a mensagem de manutenção está ativa.
-  // Para desabilitar a manutenção, basta esconder o div de manutenção e mostrar o conteúdo:
-  setTimeout(function() {
-    document.querySelector('.maintenance').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-  }, 5000); // Exibe após 5 segundos (pode ser ajustado conforme necessário)
-</script>
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/checkAdmin', { credentials: 'include' });
+        const data = await res.json();
+        if (data.isAdmin) {
+          btnAdm.style.display = 'none';
+          btnUser.style.display = 'none';
+          btnLogout.style.display = 'inline-block';
+          loginAdminForm.style.display = 'none';
+        } else {
+          btnAdm.style.display = 'inline-block';
+          btnUser.style.display = 'inline-block';
+          btnLogout.style.display = 'none';
+        }
+      } catch {
+        btnAdm.style.display = 'inline-block';
+        btnUser.style.display = 'inline-block';
+        btnLogout.style.display = 'none';
+      }
+    }
+
+    checkAdmin();
+
+    btnAdm.addEventListener('click', () => {
+      if (loginAdminForm.style.display === 'block') {
+        loginAdminForm.style.display = 'none';
+        loginError.style.display = 'none';
+      } else {
+        loginAdminForm.style.display = 'block';
+        loginError.style.display = 'none';
+        document.getElementById('senha').value = '';
+        document.getElementById('senha').focus();
+      }
+    });
+
+    btnUser.addEventListener('click', () => {
+      window.location.href = 'app.html';
+    });
+
+    loginAdminForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const senha = document.getElementById('senha').value.trim();
+
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ senha })
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          loginError.textContent = data.erro || 'Erro no login';
+          loginError.style.display = 'block';
+          document.getElementById('senha').focus();
+          return;
+        }
+
+        btnAdm.style.display = 'none';
+        btnUser.style.display = 'none';
+        btnLogout.style.display = 'inline-block';
+        loginAdminForm.style.display = 'none';
+        loginError.style.display = 'none';
+
+        window.location.href = 'app.html?adm=1';
+      } catch (error) {
+        loginError.textContent = 'Erro de comunicação com o servidor';
+        loginError.style.display = 'block';
+        document.getElementById('senha').focus();
+      }
+    });
+
+    btnLogout.addEventListener('click', async () => {
+      try {
+        await fetch('/logout', { method: 'POST', credentials: 'include' });
+      } catch {
+        // ignore erros
+      }
+      location.reload();
+    });
+  </script>
 </body>
 </html>
