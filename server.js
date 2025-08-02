@@ -172,36 +172,48 @@ function definirRotas() {
       });
   });
 
-  // Editar horário (**SEM proteção admin**)
+ // Editar horário (**SEM proteção admin**)
 app.post('/editarHorario', (req, res) => {
   const { id, hora_inicio } = req.body;
+  
   if (!id || !hora_inicio) {
     return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
   }
+  
   if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
     return res.status(400).json({ erro: 'hora_inicio inválida' });
   }
 
   const [h, m, s] = hora_inicio.split(':').map(Number);
+  
   let dateInicio = new Date();
   dateInicio.setHours(h, m, s, 0);
-  let dateFim = new Date(dateInicio.getTime() + 75 * 60000); // +75 minutos
-
+  
+  // Não vamos alterar a hora de fim diretamente, ela será recalculada a partir da nova hora de início
+  let dateFim = new Date(dateInicio.getTime() + 75 * 60000); // 75 minutos depois da hora de início
   const pad = n => n.toString().padStart(2, '0');
   const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
+  
+  // Hora atual (agora) para comparações
   const agora = new Date();
   
-  let status = '🟡'; // status inicial é "🟡" (iniciado)
+  // Lógica para determinar o status
+  let status = '🟡';  // Inicialmente, consideramos "em andamento"
   
-  // Se a hora de fim já passou
+  // Se a hora de fim já passou, muda o status para "finalizado" (🟢)
   if (dateFim < agora) {
-    status = '🟢'; // Tarefa finalizada
+    status = '🟢';
   }
-  // Se a hora de início ainda não chegou
+  // Se a hora de início já passou, muda o status para "em andamento" (🟡)
+  else if (dateInicio <= agora) {
+    status = '🟡';
+  }
+  // Se a hora de início ainda não chegou, o status permanece "pendente" (🔴)
   else if (dateInicio > agora) {
-    status = '🔴'; // Tarefa pendente
+    status = '🔴';
   }
   
+  // Atualizando apenas a hora de início e hora de fim, sem alterar a hora de fim diretamente
   db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
     [hora_inicio, horaFim, status, id], (err) => {
       if (err) {
@@ -211,6 +223,7 @@ app.post('/editarHorario', (req, res) => {
       res.sendStatus(200);
     });
 });
+
 
   // Editar local (**SEM proteção admin**)
   app.post('/editarLocal', (req, res) => {
@@ -262,5 +275,5 @@ async function inicializar() {
     process.exit(1);
   }
 }
-//iniciar
+
 inicializar();
