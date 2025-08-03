@@ -171,7 +171,7 @@ function definirRotas() {
         res.sendStatus(200);
       });
   });
-
+//Editar hora
   app.post('/editarHorario', (req, res) => {
   const { id, hora_inicio } = req.body;
   if (!id || !hora_inicio) {
@@ -226,7 +226,6 @@ function definirRotas() {
       }
       res.sendStatus(200);
     });
-});
 
   // Excluir pessoa (**SEM proteção admin**)
   app.post('/excluir', (req, res) => {
