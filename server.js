@@ -201,22 +201,18 @@ app.post('/editarHorario', (req, res) => {
     return res.status(400).json({ erro: 'hora_inicio inválida' });
   }
 
-  const [h, m, s] = hora_inicio.split(':').map(Number);
-  let dateInicio = new Date();
-  dateInicio.setHours(h, m, s, 0);
-  let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
+  // Corrigindo fuso na construção das datas
+  const dateInicio = moment.tz(`1970-01-01 ${hora_inicio}`, 'America/Sao_Paulo');
+  const dateFim = dateInicio.clone().add(75, 'minutes');
 
-  const pad = n => n.toString().padStart(2, '0');
-  const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
+  const horaFim = dateFim.format('HH:mm:ss');
+  const agora = moment.tz('America/Sao_Paulo');
 
-  const agora = new Date();
   let status;
-
-  // Correção da lógica
-  if (dateInicio > agora) {
-    status = '🔴'; // Ainda não iniciado
-  } else if (dateFim <= agora) {
-    status = '🟢'; // Já finalizado
+  if (dateInicio.isAfter(agora)) {
+    status = '🔴'; // Ainda não iniciou
+  } else if (dateFim.isBefore(agora)) {
+    status = '🟢'; // Finalizado
   } else {
     status = '🟡'; // Em andamento
   }
