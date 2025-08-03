@@ -8,6 +8,14 @@ const moment = require('moment-timezone');  // Adicionar biblioteca moment-timez
 const app = express();
 const db = new sqlite3.Database('./database.db');
 
+// Função para verificar se é admin
+function verificarAdmin(req, res, next) {
+  if (!req.session.isAdmin) {
+    return res.status(403).json({ erro: 'Acesso restrito. Somente administradores' });
+  }
+  next();
+}
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -116,8 +124,14 @@ function definirRotas() {
       }
       // Converter as datas para o fuso horário de São Paulo antes de retornar
       const pessoasComHorariosCorretos = rows.map(p => {
-        p.hora_inicio = moment.utc(p.hora_inicio).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
-        p.hora_fim = moment.utc(p.hora_fim).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
+        // Garantir que não exiba 'Invalid Date'
+        if (p.hora_inicio && p.hora_fim) {
+          p.hora_inicio = moment.utc(p.hora_inicio).tz('America/Sao_Paulo').format('HH:mm:ss');
+          p.hora_fim = moment.utc(p.hora_fim).tz('America/Sao_Paulo').format('HH:mm:ss');
+        } else {
+          p.hora_inicio = '';
+          p.hora_fim = '';
+        }
         return p;
       });
       res.json(pessoasComHorariosCorretos);
