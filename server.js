@@ -192,7 +192,6 @@ app.get('/pessoas', (req, res) => {
       });
   });
 
-// Editar horário (**SEM proteção admin**)
 app.post('/editarHorario', (req, res) => {
   const { id, hora_inicio } = req.body;
   if (!id || !hora_inicio) {
@@ -203,25 +202,26 @@ app.post('/editarHorario', (req, res) => {
   }
 
   const [h, m, s] = hora_inicio.split(':').map(Number);
-  let dateInicio = new Date();
-  dateInicio.setHours(h, m, s, 0);
-  let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
-  
-  // Formatar horaFim corretamente
-  const pad = n => n.toString().padStart(2, '0');
-  const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
 
-  const agora = new Date();
-  let status = '🟡'; // Status inicial
+  // Criar objeto Date para hora_inicio com fuso horário America/Sao_Paulo
+  // Usar moment para facilitar o controle do timezone e adicionar 75 minutos
+  const momentInicio = moment.tz(hora_inicio, 'HH:mm:ss', 'America/Sao_Paulo');
+  const momentFim = momentInicio.clone().add(75, 'minutes');
 
-  // Lógica de alteração de status
-  if (dateFim < agora) {
-    status = '🟢'; // Finalizado
-  } else if (dateInicio > agora) {
-    status = '🔴'; // Não iniciado
+  const horaFim = momentFim.format('HH:mm:ss');
+
+  const agora = moment().tz('America/Sao_Paulo');
+
+  let status;
+
+  if (momentInicio.isAfter(agora)) {
+    status = '🔴'; // Ainda não iniciado
+  } else if (momentFim.isBefore(agora) || momentFim.isSame(agora)) {
+    status = '🟢'; // Já finalizado
+  } else {
+    status = '🟡'; // Em andamento
   }
 
-  // Atualizar o banco de dados
   db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
     [hora_inicio, horaFim, status, id], (err) => {
       if (err) {
