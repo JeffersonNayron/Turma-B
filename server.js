@@ -192,6 +192,10 @@ app.get('/pessoas', (req, res) => {
       });
   });
 
+<<<<<<< HEAD
+=======
+// Editar horário (**SEM proteção admin**)
+>>>>>>> 46d613e35c01f0a187a5519f485e8c7b616ee37b
 app.post('/editarHorario', (req, res) => {
   const { id, hora_inicio } = req.body;
   if (!id || !hora_inicio) {
@@ -205,11 +209,17 @@ app.post('/editarHorario', (req, res) => {
   let dateInicio = new Date();
   dateInicio.setHours(h, m, s, 0);
   let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
+<<<<<<< HEAD
 
+=======
+  
+  // Formatar horaFim corretamente
+>>>>>>> 46d613e35c01f0a187a5519f485e8c7b616ee37b
   const pad = n => n.toString().padStart(2, '0');
   const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
 
   const agora = new Date();
+<<<<<<< HEAD
   let status;
 
   // Correção da lógica
@@ -221,6 +231,18 @@ app.post('/editarHorario', (req, res) => {
     status = '🟡'; // Em andamento
   }
 
+=======
+  let status = '🟡'; // Status inicial
+
+  // Lógica de alteração de status
+  if (dateFim < agora) {
+    status = '🟢'; // Finalizado
+  } else if (dateInicio > agora) {
+    status = '🔴'; // Não iniciado
+  }
+
+  // Atualizar o banco de dados
+>>>>>>> 46d613e35c01f0a187a5519f485e8c7b616ee37b
   db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
     [hora_inicio, horaFim, status, id], (err) => {
       if (err) {
@@ -231,6 +253,10 @@ app.post('/editarHorario', (req, res) => {
     });
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 46d613e35c01f0a187a5519f485e8c7b616ee37b
   // Excluir pessoa (**SEM proteção admin**)
   app.post('/excluir', (req, res) => {
     db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {

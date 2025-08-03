@@ -257,6 +257,7 @@
     }).then(carregarPessoas);
   }
 
+<<<<<<< HEAD
 
 
   function excluir(id) {
@@ -283,6 +284,27 @@
   }
 
 
+=======
+  function excluir(id) {
+    fetch('/excluir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    }).then(carregarPessoas);
+  }
+
+  function limparDados() {
+    fetch('/limpar', { method: 'POST' })
+      .then(response => {
+        if (response.ok) {
+          setTimeout(() => carregarPessoas(), 500);
+        } else {
+          alert('Erro ao limpar dados.');
+        }
+      });
+  }
+
+>>>>>>> 46d613e35c01f0a187a5519f485e8c7b616ee37b
   function editarLocal(span, id) {
     const locais = ["X6", "X5", "PIAL/OFC", "VV"];
     const currentLocal = span.textContent;
