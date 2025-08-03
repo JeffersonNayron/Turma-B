@@ -237,8 +237,7 @@
       }
     };
   }
-
-  document.getElementById('formPessoa').addEventListener('submit', e => {
+    document.getElementById('formPessoa').addEventListener('submit', e => {
     e.preventDefault();
     const form = new FormData(e.target);
     fetch('/adicionar', {
