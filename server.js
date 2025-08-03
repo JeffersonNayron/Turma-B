@@ -23,6 +23,28 @@ app.use(session({
   }
 }));
 
+// Função para criar tabela pessoas se não existir (retorna Promise)
+function criarTabelaSeNaoExistir() {
+  return new Promise((resolve, reject) => {
+    db.run(`CREATE TABLE IF NOT EXISTS pessoas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT,
+      local TEXT,
+      status TEXT DEFAULT '🔴',
+      hora_inicio TEXT,
+      hora_fim TEXT,
+      mensagem TEXT DEFAULT ''
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela pessoas:', err);
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
 // Função que retorna Promise para garantir coluna mensagem
 function garantirColunaMensagem() {
   return new Promise((resolve, reject) => {
@@ -50,37 +72,6 @@ function garantirColunaMensagem() {
       }
     });
   });
-}
-
-// Função para criar tabela pessoas se não existir (retorna Promise)
-function criarTabelaSeNaoExistir() {
-  return new Promise((resolve, reject) => {
-    db.run(`CREATE TABLE IF NOT EXISTS pessoas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome TEXT,
-      local TEXT,
-      status TEXT DEFAULT '🔴',
-      hora_inicio TEXT,
-      hora_fim TEXT,
-      mensagem TEXT DEFAULT ''
-    )`, (err) => {
-      if (err) {
-        console.error('Erro ao criar tabela pessoas:', err);
-        reject(err);
-        return;
-      }
-      resolve();
-    });
-  });
-}
-
-// Middleware para proteger rotas admin
-function verificarAdmin(req, res, next) {
-  if (req.session && req.session.isAdmin) {
-    next();
-  } else {
-    res.status(401).json({ erro: 'Não autorizado' });
-  }
 }
 
 // Definição das rotas - já fora do callback!
@@ -133,27 +124,15 @@ function definirRotas() {
     });
   });
 
-  // Adicionar pessoa (**SEM proteção admin**)
-  app.post('/adicionar', (req, res) => {
-    const { nome, local } = req.body;
-    db.run("INSERT INTO pessoas (nome, local) VALUES (?, ?)", [nome, local], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao adicionar pessoa' });
-      }
-      res.sendStatus(200);
-    });
-  });
-
   // Iniciar pessoa (**SEM proteção admin**)
   app.post('/iniciar', (req, res) => {
     const { id } = req.body;
     const agora = moment().tz('America/Sao_Paulo'); // Usando o momento com timezone de São Paulo
-    const horaInicio = agora.format('HH:mm:ss');
-    
-    // Evitar modificar diretamente 'agora'
-    const fim = moment(agora).add(75, 'minutes');  // Crie um novo momento para fim
-    const horaFim = fim.format('HH:mm:ss');
+    const horaInicio = agora.format('YYYY-MM-DD HH:mm:ss'); // Formato de data e hora adequado para o banco de dados
+
+    // Evitar modificar diretamente 'agora' para o cálculo de hora fim
+    const fim = moment(agora).add(75, 'minutes');  // Crie um novo momento para o fim
+    const horaFim = fim.format('YYYY-MM-DD HH:mm:ss');
 
     db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
       ['🟡', agora.utc().format('YYYY-MM-DDTHH:mm:ssZ'), fim.utc().format('YYYY-MM-DDTHH:mm:ssZ'), id], (err) => {
@@ -185,7 +164,7 @@ function definirRotas() {
     let dateInicio = moment().tz('America/Sao_Paulo').set({ hour: h, minute: m, second: s });
     let dateFim = moment(dateInicio).add(75, 'minutes');
 
-    const horaFim = dateFim.format('HH:mm:ss');
+    const horaFim = dateFim.format('YYYY-MM-DD HH:mm:ss');
     const agora = moment();
     let status = '🟡';
     if (dateFim.isBefore(agora)) status = '🟢';
