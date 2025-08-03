@@ -3,6 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
+const moment = require('moment-timezone');  // Adicionar biblioteca moment-timezone
 
 const app = express();
 const db = new sqlite3.Database('./database.db');
@@ -11,9 +12,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurar sessão
+// Configuração de sessão
 app.use(session({
-  secret: 'VascoSenai2025', // altere para algo forte
+  secret: 'VascoSenai2025',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -122,7 +123,13 @@ function definirRotas() {
         console.error(err);
         return res.status(500).json({ erro: 'Erro ao listar pessoas' });
       }
-      res.json(rows);
+      // Converter as datas para o fuso horário de São Paulo antes de retornar
+      const pessoasComHorariosCorretos = rows.map(p => {
+        p.hora_inicio = moment.utc(p.hora_inicio).tz('America/Sao_Paulo').format('HH:mm:ss');
+        p.hora_fim = moment.utc(p.hora_fim).tz('America/Sao_Paulo').format('HH:mm:ss');
+        return p;
+      });
+      res.json(pessoasComHorariosCorretos);
     });
   });
 
@@ -141,24 +148,13 @@ function definirRotas() {
   // Iniciar pessoa (**SEM proteção admin**)
   app.post('/iniciar', (req, res) => {
     const { id } = req.body;
-    const agora = new Date();
-    const horaInicio = agora.toLocaleTimeString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-    const fim = new Date(agora.getTime() + 75 * 60000);
-    const horaFim = fim.toLocaleTimeString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+    const agora = moment().tz('America/Sao_Paulo'); // Usando o momento com timezone de São Paulo
+    const horaInicio = agora.format('HH:mm:ss');
+    const fim = agora.add(75, 'minutes');
+    const horaFim = fim.format('HH:mm:ss');
+    
     db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
-      ['🟡', horaInicio, horaFim, id], (err) => {
+      ['🟡', agora.utc().format('YYYY-MM-DDTHH:mm:ssZ'), fim.utc().format('YYYY-MM-DDTHH:mm:ssZ'), id], (err) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ erro: 'Erro ao iniciar pessoa' });
@@ -181,18 +177,19 @@ function definirRotas() {
     if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
       return res.status(400).json({ erro: 'hora_inicio inválida' });
     }
+
     const [h, m, s] = hora_inicio.split(':').map(Number);
-    let dateInicio = new Date();
-    dateInicio.setHours(h, m, s, 0);
-    let dateFim = new Date(dateInicio.getTime() + 75 * 60000);
-    const pad = n => n.toString().padStart(2, '0');
-    const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
-    const agora = new Date();
+    let dateInicio = moment().tz('America/Sao_Paulo').set({ hour: h, minute: m, second: s });
+    let dateFim = moment(dateInicio).add(75, 'minutes');
+
+    const horaFim = dateFim.format('HH:mm:ss');
+    const agora = moment();
     let status = '🟡';
-    if (dateFim < agora) status = '🟢';
-    else if (dateInicio > agora) status = '🔴';
+    if (dateFim.isBefore(agora)) status = '🟢';
+    else if (dateInicio.isAfter(agora)) status = '🔴';
+
     db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
-      [hora_inicio, horaFim, status, id], (err) => {
+      [dateInicio.utc().format('YYYY-MM-DDTHH:mm:ssZ'), dateFim.utc().format('YYYY-MM-DDTHH:mm:ssZ'), status, id], (err) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ erro: 'Erro ao atualizar horário' });
@@ -214,29 +211,11 @@ function definirRotas() {
 
   // Limpar dados (**SEM proteção admin**)
   app.post('/limpar', (req, res) => {
-    const sql = `
-      UPDATE pessoas 
-      SET status = '🔴',
-          hora_inicio = NULL,
-          hora_fim = NULL,
-          mensagem = NULL
-    `;
+    const sql = `UPDATE pessoas SET status = '🔴', hora_inicio = NULL, hora_fim = NULL, mensagem = NULL`;
     db.run(sql, function(err) {
       if (err) {
         console.error('Erro ao limpar dados:', err.message);
         return res.status(500).send('Erro ao limpar dados');
-      }
-      res.sendStatus(200);
-    });
-  });
-
-  // Editar local (**SEM proteção admin**)
-  app.post('/editarLocal', (req, res) => {
-    const { id, local } = req.body;
-    db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao atualizar local' });
       }
       res.sendStatus(200);
     });
@@ -268,7 +247,6 @@ async function inicializar() {
   try {
     await criarTabelaSeNaoExistir();
     await garantirColunaMensagem();
-
     definirRotas();
 
     const PORT = process.env.PORT || 8080;
