@@ -16,7 +16,7 @@ let idCounter = 1;
 
 // Função para calcular status baseado no horário atual e horários da pessoa
 function calcularStatus(pessoa) {
-  if (!pessoa.hora_inicio) return '🔴';  // Pendente (Emoji de Círculo Amarelo)
+  if (!pessoa.hora_inicio) return '🔴';  // Pendente (Emoji de Círculo Vermelho)
 
   const now = moment().tz('America/Sao_Paulo'); // hora atual em Brasília
 
@@ -26,19 +26,31 @@ function calcularStatus(pessoa) {
     : inicio.clone().add(75, 'minutes');
 
   if (now.isBefore(inicio)) return '🔴';  // Pendente
-  if (now.isBetween(inicio, fim, null, '[)')) return '🟡';  // Em Andamento (Emoji de Círculo Verde)
+  if (now.isBetween(inicio, fim, null, '[)')) return '🟡';  // Em Andamento (Emoji de Círculo Amarelo)
   if (now.isSameOrAfter(fim)) return '✅';  // Concluído (Emoji de Círculo Verde com Check)
 
   return '🔴';  // Pendente
 }
 
-// Rota para obter pessoas
+// Função para transformar o status em um valor numérico para ordenar
+function statusToOrder(status) {
+  if (status === '🔴') return 1;  // Pendente
+  if (status === '🟡') return 2;  // Em andamento
+  if (status === '✅') return 3;  // Concluído
+  return 0;  // Caso padrão
+}
+
+// Rota para obter pessoas, ordenando pelo status
 app.get('/pessoas', (req, res) => {
   // Atualiza o status de cada pessoa
   pessoas = pessoas.map(p => ({
     ...p,
     status: calcularStatus(p)
   }));
+
+  // Ordena as pessoas por status (pendente > em andamento > concluído)
+  pessoas.sort((a, b) => statusToOrder(a.status) - statusToOrder(b.status));
+
   res.json(pessoas);
 });
 

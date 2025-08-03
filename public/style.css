@@ -189,3 +189,28 @@ select#local:focus {
   color: #007bff;
   /* Customize como quiser */
 }
+  /* Estilo do botão no canto superior esquerdo */
+#dashboardBtn {
+  position: fixed;
+  top: 656px;
+  left: 10px;
+  background-color: rgba(0, 123, 255, 0.1); /* Cor com transparência */
+  color: #007bff; /* Cor do texto */
+  border-radius: 25px;
+  padding: 8px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  z-index: 9999;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#dashboardBtn:hover {
+  background-color: rgba(0, 123, 255, 0.3); /* Cor de fundo ao passar o mouse */
+  color: #ffffff; /* Cor do texto ao passar o mouse */
+}
+
+#dashboardBtn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
