@@ -94,6 +94,8 @@
         data.forEach(p => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
+
+            <!-- Status com Emoji -->
             <td class="status">${p.status}</td>
             <td>${p.nome}</td>
             <td class="${p.local === 'PIAL/OFC' ? 'local-pial-ofc' : ''}">

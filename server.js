@@ -1,11 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment-timezone');
+const path = require('path'); // Para manipulação de caminhos de arquivos
 const app = express();
-const PORT = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Simulação de banco de dados em memória
 let pessoas = [];
@@ -13,7 +16,7 @@ let idCounter = 1;
 
 // Função para calcular status baseado no horário atual e horários da pessoa
 function calcularStatus(pessoa) {
-  if (!pessoa.hora_inicio) return 'Pendente';
+  if (!pessoa.hora_inicio) return '🔴';  // Pendente (Emoji de Círculo Amarelo)
 
   const now = moment().tz('America/Sao_Paulo'); // hora atual em Brasília
 
@@ -22,11 +25,11 @@ function calcularStatus(pessoa) {
     ? moment.tz(pessoa.hora_fim, 'HH:mm:ss', 'America/Sao_Paulo')
     : inicio.clone().add(75, 'minutes');
 
-  if (now.isBefore(inicio)) return 'Pendente';
-  if (now.isBetween(inicio, fim, null, '[)')) return 'Em Andamento';
-  if (now.isSameOrAfter(fim)) return 'Concluído';
+  if (now.isBefore(inicio)) return '🔴';  // Pendente
+  if (now.isBetween(inicio, fim, null, '[)')) return '🟡';  // Em Andamento (Emoji de Círculo Verde)
+  if (now.isSameOrAfter(fim)) return '✅';  // Concluído (Emoji de Círculo Verde com Check)
 
-  return 'Pendente';
+  return '🔴';  // Pendente
 }
 
 // Rota para obter pessoas
@@ -52,7 +55,7 @@ app.post('/adicionar', (req, res) => {
     local,
     hora_inicio: null,
     hora_fim: null,
-    status: 'Pendente',
+    status: '🔴',  // Pendente (Emoji de Círculo Amarelo)
     mensagem: ''
   });
 
@@ -68,7 +71,7 @@ app.post('/iniciar', (req, res) => {
   const now = moment().tz('America/Sao_Paulo');
   pessoa.hora_inicio = now.format('HH:mm:ss');
   pessoa.hora_fim = now.clone().add(75, 'minutes').format('HH:mm:ss');
-  pessoa.status = 'Em Andamento';
+  pessoa.status = '🟡';  // Em Andamento (Emoji de Círculo Verde)
 
   res.json({ success: true });
 });
@@ -130,6 +133,7 @@ app.get('/api/version', (req, res) => {
   res.json({ version: '1.0.0' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+// Iniciar o servidor
+app.listen(8080, () => {
+  console.log(`Servidor rodando na porta 8080`);
 });
