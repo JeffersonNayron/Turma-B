@@ -181,25 +181,41 @@ function definirRotas() {
     return res.status(400).json({ erro: 'hora_inicio inválida' });
   }
 
-  // Transformar hora_inicio em data
+  // Converter hora_inicio para um objeto Date
   const [h, m, s] = hora_inicio.split(':').map(Number);
   let dateInicio = new Date();
   dateInicio.setHours(h, m, s, 0);
+  
+  // Calcular hora de término (75 minutos após o início)
   let dateFim = new Date(dateInicio.getTime() + 75 * 60000);  // Adicionando 75 minutos
 
   const pad = n => n.toString().padStart(2, '0');
   const horaFim = `${pad(dateFim.getHours())}:${pad(dateFim.getMinutes())}:${pad(dateFim.getSeconds())}`;
 
-  // Obter a hora atual
+  // Obter o horário atual
   const agora = new Date();
 
-  let status = '🔴'; // Default vermelho (ainda não iniciou)
+  // Determinar o status com base nas comparações de tempo
+  let status = '🔴'; // Default: vermelho (ainda não iniciou)
 
   if (dateInicio <= agora && dateFim >= agora) {
-    status = '🟡';  // Em andamento (iniciou, mas ainda não terminou)
+    // Se o horário de início já passou e o horário de fim ainda não passou, o status é amarelo
+    status = '🟡';
   } else if (dateFim < agora) {
-    status = '🟢';  // Concluído (horário final passou)
+    // Se o horário de fim já passou, o status é verde
+    status = '🟢';
   }
+
+  // Atualizar a pessoa no banco de dados com o novo horário e status
+  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
+    [hora_inicio, horaFim, status, id], (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ erro: 'Erro ao atualizar horário' });
+      }
+      res.sendStatus(200);
+    });
+});
 
   // Atualizar o horário e o status no banco de dados
   db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
