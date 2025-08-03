@@ -1,316 +1,135 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-const path = require('path');
-const session = require('express-session');
-const moment = require('moment-timezone');  // Agora o moment-timezone está sendo importado
-
+const moment = require('moment-timezone');
 const app = express();
-const db = new sqlite3.Database('./database.db');
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configurar sessão
-app.use(session({
-  secret: 'VascoSenai2025', // altere para algo forte
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 2 // 2 horas
-  }
-}));
+// Simulação de banco de dados em memória
+let pessoas = [];
+let idCounter = 1;
 
-// Função que retorna Promise para garantir coluna mensagem
-function garantirColunaMensagem() {
-  return new Promise((resolve, reject) => {
-    db.all("PRAGMA table_info(pessoas)", (err, columns) => {
-      if (err) {
-        console.error('Erro ao verificar colunas:', err);
-        reject(err);
-        return;
-      }
-      const hasMensagem = columns.some(col => col.name === 'mensagem');
-      if (!hasMensagem) {
-        console.log("Coluna 'mensagem' não existe. Criando...");
-        db.run("ALTER TABLE pessoas ADD COLUMN mensagem TEXT DEFAULT ''", (err) => {
-          if (err) {
-            console.error('Erro ao adicionar coluna mensagem:', err);
-            reject(err);
-            return;
-          }
-          console.log("Coluna 'mensagem' criada com sucesso.");
-          resolve();
-        });
-      } else {
-        console.log("Coluna 'mensagem' já existe.");
-        resolve();
-      }
-    });
-  });
+// Função para calcular status baseado no horário atual e horários da pessoa
+function calcularStatus(pessoa) {
+  if (!pessoa.hora_inicio) return 'Pendente';
+
+  const now = moment().tz('America/Sao_Paulo'); // hora atual em Brasília
+
+  const inicio = moment.tz(pessoa.hora_inicio, 'HH:mm:ss', 'America/Sao_Paulo');
+  const fim = pessoa.hora_fim
+    ? moment.tz(pessoa.hora_fim, 'HH:mm:ss', 'America/Sao_Paulo')
+    : inicio.clone().add(75, 'minutes');
+
+  if (now.isBefore(inicio)) return 'Pendente';
+  if (now.isBetween(inicio, fim, null, '[)')) return 'Em Andamento';
+  if (now.isSameOrAfter(fim)) return 'Concluído';
+
+  return 'Pendente';
 }
 
-// Função para criar tabela pessoas se não existir (retorna Promise)
-function criarTabelaSeNaoExistir() {
-  return new Promise((resolve, reject) => {
-    db.run(`CREATE TABLE IF NOT EXISTS pessoas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome TEXT,
-      local TEXT,
-      status TEXT DEFAULT '🔴',
-      hora_inicio TEXT,
-      hora_fim TEXT,
-      mensagem TEXT DEFAULT ''
-    )`, (err) => {
-      if (err) {
-        console.error('Erro ao criar tabela pessoas:', err);
-        reject(err);
-        return;
-      }
-      resolve();
-    });
-  });
-}
-
-// Middleware para proteger rotas admin
-function verificarAdmin(req, res, next) {
-  if (req.session && req.session.isAdmin) {
-    next();
-  } else {
-    res.status(401).json({ erro: 'Não autorizado' });
-  }
-}
-
-// Definição das rotas - já fora do callback!
-function definirRotas() {
-
-  // Login
-  app.post('/login', (req, res) => {
-    const { senha } = req.body;
-    const senhaCerta = 'LuanaDiva';
-
-    if (senha === senhaCerta) {
-      req.session.isAdmin = true;
-      res.json({ sucesso: true });
-    } else {
-      res.status(401).json({ erro: 'Senha incorreta' });
-    }
-  });
-
-  // Logout
-  app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-      if (err) {
-        console.error('Erro ao destruir sessão:', err);
-        return res.status(500).json({ erro: 'Erro ao fazer logout' });
-      }
-      res.clearCookie('connect.sid');
-      res.json({ sucesso: true });
-    });
-  });
-
-  // Verificar se admin está logado
-  app.get('/checkAdmin', (req, res) => {
-    res.json({ isAdmin: !!(req.session && req.session.isAdmin) });
-  });
-
-// Listar pessoas (aberto)
+// Rota para obter pessoas
 app.get('/pessoas', (req, res) => {
-  db.all("SELECT * FROM pessoas ORDER BY CASE WHEN status = '🔴' THEN 1 WHEN status = '🟡' THEN 2 ELSE 3 END, id ASC", [], (err, rows) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ erro: 'Erro ao listar pessoas' });
-    }
-
-    // Converter as datas para o fuso horário de São Paulo antes de retornar
-    const pessoasComHorariosCorretos = rows.map(p => {
-      // Verificar se hora_inicio e hora_fim existem e são válidos
-      if (p.hora_inicio && p.hora_fim) {
-        // Garantir que as horas sejam tratadas corretamente
-        p.hora_inicio = moment(p.hora_inicio, 'HH:mm:ss', true).isValid() ? moment('1970-01-01 ' + p.hora_inicio).tz('America/Sao_Paulo').format('HH:mm:ss') : '';
-        p.hora_fim = moment(p.hora_fim, 'HH:mm:ss', true).isValid() ? moment('1970-01-01 ' + p.hora_fim).tz('America/Sao_Paulo').format('HH:mm:ss') : '';
-      } else {
-        p.hora_inicio = '';
-        p.hora_fim = '';
-      }
-
-      return p;
-    });
-
-    res.json(pessoasComHorariosCorretos);
-  });
+  // Atualiza o status de cada pessoa
+  pessoas = pessoas.map(p => ({
+    ...p,
+    status: calcularStatus(p)
+  }));
+  res.json(pessoas);
 });
 
+// Adicionar pessoa
+app.post('/adicionar', (req, res) => {
+  const { nome, local } = req.body;
+  if (!nome || !local) {
+    return res.status(400).json({ error: 'Nome e local são obrigatórios' });
+  }
 
-
-
-  // Adicionar pessoa (**SEM proteção admin**)
-  app.post('/adicionar', (req, res) => {
-    const { nome, local } = req.body;
-    db.run("INSERT INTO pessoas (nome, local) VALUES (?, ?)", [nome, local], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao adicionar pessoa' });
-      }
-      res.sendStatus(200);
-    });
+  pessoas.push({
+    id: idCounter++,
+    nome,
+    local,
+    hora_inicio: null,
+    hora_fim: null,
+    status: 'Pendente',
+    mensagem: ''
   });
 
-  // Iniciar pessoa (**SEM proteção admin**)
-  app.post('/iniciar', (req, res) => {
-    const { id } = req.body;
-    const agora = new Date();
-    const horaInicio = agora.toLocaleTimeString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-    const fim = new Date(agora.getTime() + 75 * 60000);
-    const horaFim = fim.toLocaleTimeString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-    db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
-      ['🟡', horaInicio, horaFim, id], (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ erro: 'Erro ao iniciar pessoa' });
-        }
-        setTimeout(() => {
-          db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
-            if (e) console.error(e);
-          });
-        }, 75 * 60000);
-        res.sendStatus(200);
-      });
-  });
+  res.status(201).json({ success: true });
+});
 
+// Iniciar (setar hora_inicio e hora_fim)
+app.post('/iniciar', (req, res) => {
+  const { id } = req.body;
+  const pessoa = pessoas.find(p => p.id == id);
+  if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada' });
+
+  const now = moment().tz('America/Sao_Paulo');
+  pessoa.hora_inicio = now.format('HH:mm:ss');
+  pessoa.hora_fim = now.clone().add(75, 'minutes').format('HH:mm:ss');
+  pessoa.status = 'Em Andamento';
+
+  res.json({ success: true });
+});
+
+// Editar horário (hora_inicio e hora_fim)
 app.post('/editarHorario', (req, res) => {
-  const { id, hora_inicio } = req.body;
-  if (!id || !hora_inicio) {
-    return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
-  }
-  if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
-    return res.status(400).json({ erro: 'hora_inicio inválida' });
-  }
+  const { id, hora_inicio, hora_fim } = req.body;
+  const pessoa = pessoas.find(p => p.id == id);
+  if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada' });
 
-  const [h, m, s] = hora_inicio.split(':').map(Number);
-
-  // Criar objeto Date para hora_inicio com fuso horário America/Sao_Paulo
-  // Usar moment para facilitar o controle do timezone e adicionar 75 minutos
-  const momentInicio = moment.tz(hora_inicio, 'HH:mm:ss', 'America/Sao_Paulo');
-  const momentFim = momentInicio.clone().add(75, 'minutes');
-
-  const horaFim = momentFim.format('HH:mm:ss');
-
-  const agora = moment().tz('America/Sao_Paulo');
-
-  let status;
-
-  if (momentInicio.isAfter(agora)) {
-    status = '🔴'; // Ainda não iniciado
-  } else if (momentFim.isBefore(agora) || momentFim.isSame(agora)) {
-    status = '🟢'; // Já finalizado
-  } else {
-    status = '🟡'; // Em andamento
+  // Validar formato HH:mm:ss simples (pode ser melhorado)
+  if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio) || !/^\d{2}:\d{2}:\d{2}$/.test(hora_fim)) {
+    return res.status(400).json({ error: 'Formato de horário inválido' });
   }
 
-  db.run("UPDATE pessoas SET hora_inicio = ?, hora_fim = ?, status = ? WHERE id = ?",
-    [hora_inicio, horaFim, status, id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao atualizar horário' });
-      }
-      res.sendStatus(200);
-    });
+  pessoa.hora_inicio = hora_inicio;
+  pessoa.hora_fim = hora_fim;
+  pessoa.status = calcularStatus(pessoa);
+
+  res.json({ success: true });
 });
 
+// Excluir pessoa
+app.post('/excluir', (req, res) => {
+  const { id } = req.body;
+  pessoas = pessoas.filter(p => p.id != id);
+  res.json({ success: true });
+});
 
-  // Excluir pessoa (**SEM proteção admin**)
-  app.post('/excluir', (req, res) => {
-    db.run("DELETE FROM pessoas WHERE id = ?", [req.body.id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao excluir pessoa' });
-      }
-      res.sendStatus(200);
-    });
-  });
+// Limpar todos os dados
+app.post('/limpar', (req, res) => {
+  pessoas = [];
+  idCounter = 1;
+  res.json({ success: true });
+});
 
-  // Limpar dados (**SEM proteção admin**)
-  app.post('/limpar', (req, res) => {
-    const sql = `
-      UPDATE pessoas 
-      SET status = '🔴',
-          hora_inicio = NULL,
-          hora_fim = NULL,
-          mensagem = NULL
-    `;
-    db.run(sql, function(err) {
-      if (err) {
-        console.error('Erro ao limpar dados:', err.message);
-        return res.status(500).send('Erro ao limpar dados');
-      }
-      res.sendStatus(200);
-    });
-  });
+// Editar local
+app.post('/editarLocal', (req, res) => {
+  const { id, local } = req.body;
+  const pessoa = pessoas.find(p => p.id == id);
+  if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada' });
 
-  // Editar local (**SEM proteção admin**)
-  app.post('/editarLocal', (req, res) => {
-    const { id, local } = req.body;
-    db.run("UPDATE pessoas SET local = ? WHERE id = ?", [local, id], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao atualizar local' });
-      }
-      res.sendStatus(200);
-    });
-  });
+  pessoa.local = local;
+  res.json({ success: true });
+});
 
-  // Enviar mensagem (SOMENTE ADMIN)
-  app.post('/enviarMensagem', verificarAdmin, (req, res) => {
-    const { id, mensagem } = req.body;
-    if (!id || typeof mensagem !== 'string') {
-      return res.status(400).json({ erro: 'Dados inválidos' });
-    }
-    db.run("UPDATE pessoas SET mensagem = ? WHERE id = ?", [mensagem, id], function (err) {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ erro: 'Erro ao salvar mensagem' });
-      }
-      res.json({ sucesso: true });
-    });
-  });
+// Enviar mensagem
+app.post('/enviarMensagem', (req, res) => {
+  const { id, mensagem } = req.body;
+  const pessoa = pessoas.find(p => p.id == id);
+  if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada' });
 
-  // Versão API pública
-  app.get('/api/version', (req, res) => {
-    res.json({ version: '1.0.0' });
-  });
-}
+  pessoa.mensagem = mensagem;
+  res.json({ success: true });
+});
 
-// Inicialização geral (async/await)
-async function inicializar() {
-  try {
-    await criarTabelaSeNaoExistir();
-    await garantirColunaMensagem();
+// API versão
+app.get('/api/version', (req, res) => {
+  res.json({ version: '1.0.0' });
+});
 
-    definirRotas();
-
-    const PORT = process.env.PORT || 8080;
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Erro ao inicializar:', error);
-    process.exit(1);
-  }
-}
-
-inicializar();
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
