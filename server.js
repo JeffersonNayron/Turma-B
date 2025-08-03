@@ -16,7 +16,7 @@ let idCounter = 1;
 
 // Função para calcular status baseado no horário atual e horários da pessoa
 function calcularStatus(pessoa) {
-  if (!pessoa.hora_inicio) return '🔴';  // Pendente (Emoji de Círculo Vermelho)
+  if (!pessoa.hora_inicio) return '🔴';  // Pendente (Emoji de Círculo Amarelo)
 
   const now = moment().tz('America/Sao_Paulo'); // hora atual em Brasília
 
@@ -26,31 +26,19 @@ function calcularStatus(pessoa) {
     : inicio.clone().add(75, 'minutes');
 
   if (now.isBefore(inicio)) return '🔴';  // Pendente
-  if (now.isBetween(inicio, fim, null, '[)')) return '🟡';  // Em Andamento (Emoji de Círculo Amarelo)
+  if (now.isBetween(inicio, fim, null, '[)')) return '🟡';  // Em Andamento (Emoji de Círculo Verde)
   if (now.isSameOrAfter(fim)) return '✅';  // Concluído (Emoji de Círculo Verde com Check)
 
   return '🔴';  // Pendente
 }
 
-// Função para transformar o status em um valor numérico para ordenar
-function statusToOrder(status) {
-  if (status === '🔴') return 1;  // Pendente
-  if (status === '🟡') return 2;  // Em andamento
-  if (status === '✅') return 3;  // Concluído
-  return 0;  // Caso padrão
-}
-
-// Rota para obter pessoas, ordenando pelo status
+// Rota para obter pessoas
 app.get('/pessoas', (req, res) => {
   // Atualiza o status de cada pessoa
   pessoas = pessoas.map(p => ({
     ...p,
     status: calcularStatus(p)
   }));
-
-  // Ordena as pessoas por status (pendente > em andamento > concluído)
-  pessoas.sort((a, b) => statusToOrder(a.status) - statusToOrder(b.status));
-
   res.json(pessoas);
 });
 
@@ -113,12 +101,19 @@ app.post('/excluir', (req, res) => {
   res.json({ success: true });
 });
 
-// Limpar todos os dados
+
+// Limpar os dados (sem apagar as pessoas)
 app.post('/limpar', (req, res) => {
-  pessoas = [];
-  idCounter = 1;
+  pessoas = pessoas.map(p => ({
+    ...p,
+    hora_inicio: null,   // Limpar hora início
+    hora_fim: null,      // Limpar hora fim
+    status: '🔴',        // Marcar como pendente
+    mensagem: ''         // Limpar mensagem
+  }));
   res.json({ success: true });
 });
+
 
 // Editar local
 app.post('/editarLocal', (req, res) => {
