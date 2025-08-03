@@ -129,8 +129,8 @@ app.get('/pessoas', (req, res) => {
       // Verificar se hora_inicio e hora_fim existem e são válidos
       if (p.hora_inicio && p.hora_fim) {
         // Garantir que as horas sejam tratadas corretamente
-        p.hora_inicio = moment(p.hora_inicio, 'HH:mm:ss', true).isValid() ? moment('1970-01-01 ' + p.hora_inicio).tz('America/Sao_Paulo').format('HH:mm:ss') : '';
-        p.hora_fim = moment(p.hora_fim, 'HH:mm:ss', true).isValid() ? moment('1970-01-01 ' + p.hora_fim).tz('America/Sao_Paulo').format('HH:mm:ss') : '';
+        p.hora_inicio = moment.tz('1970-01-01 ' + p.hora_inicio, 'America/Sao_Paulo').format('HH:mm:ss');
+p.hora_fim    = moment.tz('1970-01-01 ' + p.hora_fim, 'America/Sao_Paulo').format('HH:mm:ss');
       } else {
         p.hora_inicio = '';
         p.hora_fim = '';
