@@ -1,0 +1,31 @@
+[1mdiff --git a/public/app.html b/public/app.html[m
+[1mindex 44494b6..2305cef 100644[m
+[1m--- a/public/app.html[m
+[1m+++ b/public/app.html[m
+[36m@@ -237,7 +237,8 @@[m
+       }[m
+     };[m
+   }[m
+[31m-    document.getElementById('formPessoa').addEventListener('submit', e => {[m
+[32m+[m
+[32m+[m[32m  document.getElementById('formPessoa').addEventListener('submit', e => {[m
+     e.preventDefault();[m
+     const form = new FormData(e.target);[m
+     fetch('/adicionar', {[m
+[36m@@ -257,8 +258,6 @@[m
+     }).then(carregarPessoas);[m
+   }[m
+ [m
+[31m-[m
+[31m-[m
+   function excluir(id) {[m
+     if (confirm('Tem certeza que deseja excluir?')) {[m
+       fetch('/excluir', {[m
+[36m@@ -282,7 +281,6 @@[m
+     }[m
+   }[m
+ [m
+[31m-[m
+   function editarLocal(span, id) {[m
+     const locais = ["X6", "X5", "PIAL/OFC", "VV"];[m
+     const currentLocal = span.textContent;[m
