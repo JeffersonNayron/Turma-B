@@ -171,12 +171,16 @@ function definirRotas() {
         res.sendStatus(200);
       });
   });
-//Editar hora
-  app.post('/editarHorario', (req, res) => {
-  const { id, hora_inicio } = req.body;
+//Editar hora status
+ app.post('/editarHorario', (req, res) => {
+  const { id, hora_inicio } = req.body;  // Certifique-se de que 'hora_inicio' está aqui!
+  
+  // Verifique se 'hora_inicio' está sendo passado
   if (!id || !hora_inicio) {
     return res.status(400).json({ erro: 'id e hora_inicio são obrigatórios' });
   }
+
+  // Aqui, você pode agora utilizar 'hora_inicio' sem problemas
   if (!/^\d{2}:\d{2}:\d{2}$/.test(hora_inicio)) {
     return res.status(400).json({ erro: 'hora_inicio inválida' });
   }
