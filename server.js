@@ -125,8 +125,8 @@ function definirRotas() {
       }
       // Converter as datas para o fuso horário de São Paulo antes de retornar
       const pessoasComHorariosCorretos = rows.map(p => {
-        p.hora_inicio = moment.utc(p.hora_inicio).tz('America/Sao_Paulo').format('HH:mm:ss');
-        p.hora_fim = moment.utc(p.hora_fim).tz('America/Sao_Paulo').format('HH:mm:ss');
+        p.hora_inicio = moment.utc(p.hora_inicio).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
+        p.hora_fim = moment.utc(p.hora_fim).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
         return p;
       });
       res.json(pessoasComHorariosCorretos);
@@ -150,20 +150,23 @@ function definirRotas() {
     const { id } = req.body;
     const agora = moment().tz('America/Sao_Paulo'); // Usando o momento com timezone de São Paulo
     const horaInicio = agora.format('HH:mm:ss');
-    const fim = agora.add(75, 'minutes');
-    const horaFim = fim.format('HH:mm:ss');
     
+    // Evitar modificar diretamente 'agora'
+    const fim = moment(agora).add(75, 'minutes');  // Crie um novo momento para fim
+    const horaFim = fim.format('HH:mm:ss');
+
     db.run("UPDATE pessoas SET status = ?, hora_inicio = ?, hora_fim = ? WHERE id = ?",
       ['🟡', agora.utc().format('YYYY-MM-DDTHH:mm:ssZ'), fim.utc().format('YYYY-MM-DDTHH:mm:ssZ'), id], (err) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ erro: 'Erro ao iniciar pessoa' });
         }
+        // Atualizar status após 75 minutos
         setTimeout(() => {
           db.run("UPDATE pessoas SET status = ? WHERE id = ?", ['🟢', id], (e) => {
             if (e) console.error(e);
           });
-        }, 75 * 60000);
+        }, 75 * 60000); // 75 minutos em milissegundos
         res.sendStatus(200);
       });
   });
