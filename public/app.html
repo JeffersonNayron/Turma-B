@@ -61,12 +61,25 @@
   outline: none;
   box-shadow: none;
 }
+
   </style>
 </head>
 
 <body class="container py-4">
+  <div id="dataAtual" style="text-align:center; font-weight:400; margin-bottom: 4px; font-size: 0.85rem; color: #444; padding-top: 4px;"></div>
+
+<script>
+  function formatarDataAtual() {
+    const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    const hoje = new Date();
+    const dataFormatada = hoje.toLocaleDateString('pt-BR', opcoes);
+    document.getElementById('dataAtual').textContent = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+  }
+  formatarDataAtual();
+</script>
+
 <!-- Botão para acessar o Dashboard -->
-<a href="dashboard.html" class="btn btn-outline-primary btn-sm" id="dashboardBtn">+ Dashboard</a>
+<a href="dashboard.html" class="btn btn-outline-primary btn-sm" id="dashboardBtn">Dashboard</a>
 
   <h1 class="fw-bold logo">🚂 Revezamento Turma B</h1>
  
@@ -122,7 +135,9 @@
           return hora.replace(/(\d{2}:\d{2})(:\d{2})/, "$1<span class='segundos'>$2</span>");
         }
 
-        data.forEach(p => {
+        data.sort((a, b) => a.nome.toLowerCase().localeCompare(b.nome.toLowerCase()))
+    .forEach(p => {
+
           const tr = document.createElement('tr');
           tr.innerHTML = `
 
