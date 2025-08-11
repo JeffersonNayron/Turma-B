@@ -193,7 +193,7 @@ app.get('/api/version', (req, res) => {
   res.json({ version: '1.0.0' });
 });
 
-const porta = 8080;
+const porta = 3000;
 app.listen(porta, () => {
   console.log(`Servidor rodando na porta ${porta}`);
 });
