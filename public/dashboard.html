@@ -4,272 +4,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard B</title>
+  <link rel="icon" type="image/png" href="image/turmaB.jpeg">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #f4f7fc;
-      padding-top: 50px;
-    }
+  font-family: 'Roboto', sans-serif;
+  background: #f4f7fc;
+  padding-top: 50px;
+}
 
-    .dashboard-card {
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease;
-    }
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
 
-    .dashboard-card:hover {
-      transform: translateY(-5px);
-    }
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
 
-    .status {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
+.status {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
 
-    .status-pendente { color: #f44336; }
-    .status-concluido { color: #4caf50; }
-    .status-andamento { color: #ffeb3b; }
+.status-pendente { color: #f44336; }
+.status-concluido { color: #4caf50; }
+.status-andamento { color: #ffeb3b; }
 
-    .progress-bar {
-      height: 20px;
-    }
+.progress-bar {
+  height: 20px;
+}
 
-    .table th, .table td {
-      vertical-align: middle;
-    }
+.table th, .table td {
+  vertical-align: middle;
+}
 
-    .table-bordered {
-      border: 2px solid #ddd;
-    }
+.table-bordered {
+  border: 2px solid #ddd;
+}
 
-    .table-hover tbody tr:hover {
-      background-color: #f9f9f9;
-    }
+.table-hover tbody tr:hover {
+  background-color: #f9f9f9;
+}
 
-    .header {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #333;
-    }
+.header {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
 
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
 
-    .btn-back {
-      font-size: 1.1rem;
-      padding: 10px 20px;
-      border-radius: 5px;
-      background-color: #4caf50;
-      color: #fff;
-      border: none;
-      text-decoration: none;
-      transition: background-color 0.3s ease;
-    }
+.btn-back {
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
 
-    .btn-back:hover {
-      background-color: #45a049;
-    }
+.btn-back:hover {
+  background-color: #45a049;
+}
 
-    .card-title {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-    }
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
 
-    .card-body {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    @media (max-width: 768px) {
-      .dashboard-card {
-        padding: 20px;
-      }
+.table-responsive {
+  overflow-x: auto;
+}
 
-      .status {
-        font-size: 1rem;
-      }
-
-      .btn-back {
-        font-size: 1rem;
-      }
-
-      .header {
-        font-size: 1.5rem;
-      }
-    }
-    <style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    background: #f4f7fc;
-    padding-top: 50px;
-  }
-
+@media (max-width: 768px) {
   .dashboard-card {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease;
-  }
-
-  .dashboard-card:hover {
-    transform: translateY(-5px);
+    padding: 20px;
   }
 
   .status {
-    font-size: 1.3rem;
-    font-weight: bold;
-  }
-
-  .status-pendente { color: #f44336; }
-  .status-concluido { color: #4caf50; }
-  .status-andamento { color: #ffeb3b; }
-
-  .progress-bar {
-    height: 20px;
-  }
-
-  .table th, .table td {
-    vertical-align: middle;
-  }
-
-  .table-bordered {
-    border: 2px solid #ddd;
-  }
-
-  .table-hover tbody tr:hover {
-    background-color: #f9f9f9;
-  }
-
-  /* Torna a tabela scrollável horizontalmente em telas pequenas */
-  .table-responsive {
-    overflow-x: auto;
-  }
-
-  .header {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
-  }
-
-  .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap; /* Para quebrar linha em telas pequenas */
+    font-size: 1rem;
   }
 
   .btn-back {
-    font-size: 1.1rem;
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-    margin-top: 10px; /* Dá espaço em telas pequenas */
+    font-size: 1rem;
   }
 
-  .btn-back:hover {
-    background-color: #45a049;
-  }
-
-  .card-title {
+  .header {
     font-size: 1.5rem;
-    margin-bottom: 15px;
   }
+}
 
-  .card-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Para melhor encaixe em telas pequenas */
-    gap: 10px;
-  }
-
-  /* Ajustes para telas até 768px (tablets e celulares) */
-  @media (max-width: 768px) {
-    .dashboard-card {
-      padding: 20px;
-    }
-
-    .status {
-      font-size: 1rem;
-    }
-
-    .btn-back {
-      font-size: 1rem;
-      padding: 8px 15px;
-      width: 100%; /* Botão ocupa toda a linha */
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .header {
-      font-size: 1.5rem;
-      width: 100%; /* Header ocupa linha inteira */
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .dashboard-header {
-      justify-content: center;
-    }
-
-    /* Cards ficam 100% largura empilhados */
-    .row > [class*='col-md-4'] {
-      flex: 0 0 100%;
-      max-width: 100%;
-      margin-bottom: 15px;
-    }
-
-    /* Linha dos gráficos empilhados */
-    .row > [class*='col-md-6'] {
-      flex: 0 0 100%;
-      max-width: 100%;
-      margin-bottom: 20px;
-    }
-
-    /* Ajuste no card-body para ficar mais compacto */
-    .card-body {
-      justify-content: center;
-      gap: 5px;
-    }
-  }
-  @media (max-width: 500px) {
+@media (max-width: 500px) {
   table.table tbody tr td,
   table.table thead tr th {
-    padding: 4px 6px;         /* Menos espaçamento */
-    font-size: 0.75rem;       /* Fonte menor */
+    padding: 4px 6px;
+    font-size: 0.75rem;
   }
-  
-  /* Permitir scroll horizontal se necessário */
-  .table-responsive {
-    overflow-x: auto;
-  }
-   .btn-back {
-    font-size: 1.1rem;
+
+  .btn-back {
+    font-size: 1.3rem;
     padding: 10px 20px;
     border-radius: 5px;
     background-color: #4caf50;
     color: #fff;
     border: none;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -277,59 +138,53 @@
 
   .btn-back:hover {
     background-color: #45a049;
+    transform: scale(1.1);
   }
 
-  /* Abaixo de 500px: botão pequeno com só o símbolo */
-  @media (max-width: 500px) {
+  @media (max-width: 450px) {
     .btn-back {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      font-size: 24px;
+      font-size: 1.1rem;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
+      padding: 0;
+      text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
     }
+
     .btn-back::before {
       content: "←";
       color: white;
-      font-weight: bold;
-      line-height: 1;
+      font-size: 1.6rem;
     }
-    /* Esconde texto interno */
-    .btn-back > span,
-    .btn-back > * {
+
+    .btn-back span {
       display: none;
     }
   }
-  @keyframes pulseGreenScale {
-  0%, 100% {
-    color: #4caf50;
-    transform: scale(1);
+
+  @media (min-width: 450px) {
+    .btn-back {
+      font-size: 1.2rem;
+      padding: 12px 24px;
+      border-radius: 5px;
+    }
+
+    .btn-back::before {
+      content: "←";
+      color: white;
+      font-size: 1.4rem;
+    }
+
+    .btn-back span {
+      display: inline-block;
+      margin-left: 8px;
+    }
   }
-  50% {
-    color: #81c784; /* verde mais claro para dar efeito de brilho */
-    transform: scale(1.1);
-  }
 }
-
-.header {
-  animation: pulseGreenScale 2.5s ease-in-out infinite;
-  font-weight: 700;
-  user-select: none;
-  cursor: default;
-  display: inline-block; /* necessário para aplicar transform */
-  transition: color 0.3s ease;
-}
-.header:hover {
-  animation-play-state: paused;
-}
-
-}
-
-</style>
 
   </style>
 </head>
@@ -422,90 +277,95 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    function carregarDashboard() {
-      fetch('/pessoas')
-        .then(res => res.json())
-        .then(data => {
-          const pendente = data.filter(p => p.status === '🔴').length;
-          const andamento = data.filter(p => p.status === '🟡').length;
-          const concluido = data.filter(p => p.status === '✅').length;
-          const total = data.length;
+  function carregarDashboard() {
+    fetch('/pessoas')
+      .then(res => res.json())
+      .then(data => {
+        const pendente = data.filter(p => p.status === '🔴').length;
+        const andamento = data.filter(p => p.status === '🟡').length;
+        const concluido = data.filter(p => p.status === '✅').length;
+        const total = data.length;
 
-          document.getElementById('pendente').textContent = pendente;
-          document.getElementById('andamento').textContent = andamento;
-          document.getElementById('concluido').textContent = concluido;
+        document.getElementById('pendente').textContent = pendente;
+        document.getElementById('andamento').textContent = andamento;
+        document.getElementById('concluido').textContent = concluido;
 
-          document.getElementById('barPendente').style.width = (pendente / total * 100 || 0) + '%';
-          document.getElementById('barAndamento').style.width = (andamento / total * 100 || 0) + '%';
-          document.getElementById('barConcluido').style.width = (concluido / total * 100 || 0) + '%';
+        document.getElementById('barPendente').style.width = (pendente / total * 100 || 0) + '%';
+        document.getElementById('barAndamento').style.width = (andamento / total * 100 || 0) + '%';
+        document.getElementById('barConcluido').style.width = (concluido / total * 100 || 0) + '%';
 
-          // Tabela
-          const tbody = document.getElementById('tabelaDashboard');
-          tbody.innerHTML = '';
-          data.sort((a, b) => {
-            const [ha, ma] = (a.hora_inicio || '99:99').split(':');
-            const [hb, mb] = (b.hora_inicio || '99:99').split(':');
-            return (+ha * 60 + +ma) - (+hb * 60 + +mb);
-          }).forEach(p => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td class="status ${p.status === '🔴' ? 'status-pendente' : p.status === '🟡' ? 'status-andamento' : 'status-concluido'}">${p.status}</td>
-              <td>${p.nome}</td>
-              <td>${p.local || '-'}</td>
-              <td>${p.hora_inicio || '-'}</td>
-              <td>${p.hora_fim || '-'}</td>
-            `;
-            tbody.appendChild(tr);
-          });
-
-          // Gráficos
-          gerarGraficos(data);
+        // Tabela
+        const tbody = document.getElementById('tabelaDashboard');
+        tbody.innerHTML = '';
+        data.sort((a, b) => {
+          const [ha, ma] = (a.hora_inicio || '99:99').split(':');
+          const [hb, mb] = (b.hora_inicio || '99:99').split(':');
+          return (+ha * 60 + +ma) - (+hb * 60 + +mb);
+        }).forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="status ${p.status === '🔴' ? 'status-pendente' : p.status === '🟡' ? 'status-andamento' : 'status-concluido'}">${p.status}</td>
+            <td>${p.nome}</td>
+            <td>${p.local || '-'}</td>
+            <td>${p.hora_inicio || '-'}</td>
+            <td>${p.hora_fim || '-'}</td>
+          `;
+          tbody.appendChild(tr);
         });
-    }
 
-    function gerarGraficos(data) {
-      const statusContagem = { '🔴': 0, '🟡': 0, '✅': 0 };
-      const locais = {};
-
-      data.forEach(p => {
-        if (statusContagem[p.status] !== undefined) statusContagem[p.status]++;
-        if (p.local) locais[p.local] = (locais[p.local] || 0) + 1;
+        // Gráficos
+        gerarGraficos(data);
       });
+  }
 
-      // Gráfico Status
-      new Chart(document.getElementById('graficoStatus'), {
-        type: 'doughnut',
-        data: {
-          labels: ['🔴 Pendentes', '🟡 Em Andamento', '✅ Concluídas'],
-          datasets: [{
-            data: [statusContagem['🔴'], statusContagem['🟡'], statusContagem['✅']],
-            backgroundColor: ['#f44336', '#ffeb3b', '#4caf50']
-          }]
-        },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-      });
+  function gerarGraficos(data) {
+    const statusContagem = { '🔴': 0, '🟡': 0, '✅': 0 };
+    const locais = {};
 
-      // Gráfico Locais
-      new Chart(document.getElementById('graficoLocais'), {
-        type: 'bar',
-        data: {
-          labels: Object.keys(locais),
-          datasets: [{
-            label: 'Pessoas por Local',
-            data: Object.values(locais),
-            backgroundColor: '#2196f3'
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-        }
-      });
-    }
+    data.forEach(p => {
+      if (statusContagem[p.status] !== undefined) statusContagem[p.status]++;
+      if (p.local) locais[p.local] = (locais[p.local] || 0) + 1;
+    });
 
-    document.addEventListener('DOMContentLoaded', carregarDashboard);
-  </script>
+    // Gráfico Status
+    new Chart(document.getElementById('graficoStatus'), {
+      type: 'doughnut',
+      data: {
+        labels: ['🔴 Pendentes', '🟡 Em Andamento', '✅ Concluídas'],
+        datasets: [{
+          data: [statusContagem['🔴'], statusContagem['🟡'], statusContagem['✅']],
+          backgroundColor: ['#f44336', '#ffeb3b', '#4caf50']
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Gráfico Locais
+    new Chart(document.getElementById('graficoLocais'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(locais),
+        datasets: [{
+          label: 'Pessoas por Local',
+          data: Object.values(locais),
+          backgroundColor: '#2196f3'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+
+  // Chama a função de atualizar o dashboard a cada 5 segundos (5000ms)
+  setInterval(carregarDashboard, 5000);
+
+  // Carrega os dados inicialmente ao carregar a página
+  document.addEventListener('DOMContentLoaded', carregarDashboard);
+</script>
+
 
 </body>
 </html>
