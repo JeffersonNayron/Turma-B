@@ -93,11 +93,31 @@
     grid-template-columns: repeat(2, 1fr); /* 2 colunas em telas médias para cima */
   }
 }
+.aviso-desenvolvimento {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffc107;
+  color: #000;
+  font-weight: bold;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  z-index: 2000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+body {
+  padding-top: 40px; /* espaço para o aviso não cobrir o conteúdo */
+}
 
   </style>
 </head>
 
 <body class="container py-4">
+  <div class="aviso-desenvolvimento text-center">
+  🚧 Esta página está em desenvolvimento. Algumas funcionalidades podem não funcionar como esperado.
+</div>
+
 
   <button class="btn-voltar" onclick="window.location.href='app.html'">← Voltar</button>
 
