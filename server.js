@@ -125,9 +125,12 @@ app.post('/enviarMensagem', (req, res) => {
 });
 
 // Versão da API
+const packageJson = require('./package.json');
+
 app.get('/api/version', (req, res) => {
-  res.json({ version: '1.0.0' });
+  res.json({ version: packageJson.version });
 });
+
 
 // Rota direta para app.html sem autenticação
 app.get('/app', (req, res) => {

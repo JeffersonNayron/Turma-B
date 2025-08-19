@@ -1,136 +1,113 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Turma B</title>
-  <link rel="icon" type="image/png" href="image/favicon.jpeg">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Revezamento Turma B</title>
+  <link rel="icon" href="image/favicon.jpeg" type="image/png" />
   <style>
-    /* Reset básico para garantir que não há margens ou paddings inesperados */
+    /* Reset básico */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    /* Estilo geral do corpo */
-    body {
-      height: 100vh;
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e1e1e1;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #1a1a1a; /* Fundo escuro */
-      color: #ffffff;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 400;
-      overflow: hidden;
+      user-select: none;
+      padding: 1rem;
     }
 
-    /* Estilo do container principal */
     .container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       text-align: center;
-      animation: fadeIn 2.5s ease-out forwards;
+      max-width: 100%;
+      width: 400px;
+      animation: fadeSlideIn 2.5s ease forwards;
+      box-sizing: border-box;
     }
 
-    /* Efeito de animação de fade-in */
-    @keyframes fadeIn {
+    @keyframes fadeSlideIn {
       0% {
         opacity: 0;
-        transform: scale(0.8);
+        transform: translateY(30px);
       }
       100% {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
       }
     }
 
-    /* Título principal */
-    .title {
-      font-size: 3rem;
+    h1 {
       font-weight: 700;
-      color: #00d8ff; /* Azul claro para contraste */
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-      transition: font-size 0.3s ease, text-shadow 0.3s ease;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      color: #00bcd4;
+      margin-bottom: 1rem;
+      letter-spacing: 0.3rem;
+      text-shadow: 0 0 12px #00bcd4, 0 0 24px #00bcd4;
+      user-select: text;
     }
 
-    /* Texto de "loading" */
-    .loading {
-      font-size: 1.5rem;
+    p.subtitle {
       font-weight: 400;
-      color: #aaa;
-      opacity: 0;
-      animation: fadeIn 2s ease-out 2s forwards;
-      letter-spacing: 1px;
-      margin-top: 20px;
+      font-size: clamp(1rem, 3vw, 1.1rem);
+      margin-bottom: 2.5rem;
+      color: #b0bec5;
+      letter-spacing: 0.08rem;
     }
 
-    /* Animação de efeito de brilho nas letras */
-    .title span {
-      display: inline-block;
-      animation: glow 1.5s ease-in-out infinite alternate;
+    /* Loader */
+    .loader {
+      border: 0.4rem solid rgba(255, 255, 255, 0.15);
+      border-top: 0.4rem solid #00bcd4;
+      border-radius: 50%;
+      width: 3.5rem;
+      height: 3.5rem;
+      margin: 0 auto;
+      animation: spin 1.3s linear infinite;
     }
 
-    @keyframes glow {
-      0% {
-        text-shadow: 0 0 10px #00d8ff, 0 0 20px #00d8ff, 0 0 30px #00d8ff;
-      }
-      100% {
-        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #ffffff;
-      }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
     }
 
-    /* Responsividade para telas pequenas */
-    @media (max-width: 450px) {
-      .title {
-        font-size: 2rem;
-        letter-spacing: 1px; /* Menos espaçamento nas letras */
-        text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6); /* Ajustar sombra para telas pequenas */
-      }
-
-      .loading {
-        font-size: 1.2rem;
-        color: #ddd; /* Cor mais suave para o texto de "loading" */
-      }
-      
-      /* Efeito suave de zoom para telas pequenas */
+    /* Ajustes para telas pequenas */
+    @media (max-width: 440px) {
       .container {
-        animation: zoomIn 2.5s ease-out forwards;
+        width: 100%;
+        padding: 2rem 1.5rem;
       }
-
-      @keyframes zoomIn {
-        0% {
-          transform: scale(0.8);
-        }
-        100% {
-          transform: scale(1);
-        }
+      h1 {
+        letter-spacing: 0.15rem;
       }
-    }
-
-    /* Efeito de fade-in para telas maiores */
-    @media (min-width: 450px) {
-      .title {
-        font-size: 3rem;
-        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6); /* Sombra mais intensa */
+      p.subtitle {
+        margin-bottom: 2rem;
       }
     }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="title"><span>Revezamento turma B</span></div>
-    <div class="loading"></div>
+  <div class="container" role="main" aria-label="Tela de apresentação do sistema Revezamento Turma B">
+    <h1>Revezamento Turma B</h1>
+    <p class="subtitle">Seu sistema de gestão ágil e moderno</p>
+    <div class="loader" aria-hidden="true"></div>
   </div>
 
   <script>
-    // Função para redirecionar para o app.html após a animação
-    setTimeout(function() {
+    setTimeout(() => {
       window.location.href = '/app.html';
-    }, 6000); // 6 segundos para esperar a animação acabar
+    }, 5000);
   </script>
-
 </body>
 </html>
