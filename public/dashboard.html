@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -10,9 +10,88 @@
 body {
   font-family: 'Roboto', sans-serif;
   background: #f4f7fc;
-  padding-top: 50px;
+  padding-top: 40px;
   color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* NOVO: painel fixo pequeno e simples no topo */
+#status-summary {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  z-index: 1000;
+  font-family: 'Roboto', sans-serif;
+  flex-wrap: nowrap;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#status-summary span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 1;
+  max-width: 120px;       /* Limite máximo de largura */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  #status-summary {
+    gap: 1.5rem;
+    font-size: 0.85rem;
+  }
+  #status-summary span {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  #status-summary {
+    gap: 1rem;
+    font-size: 0.8rem;
+  }
+  #status-summary span {
+    max-width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  #status-summary {
+    flex-direction: row;
+    padding: 7px;
+    font-size: 0.70rem;
+  }
+
+  #status-summary span {
+    justify-content: center;
+    max-width: 90%;
+    white-space: normal;
+  }
+}
+
+
+.status-pendente { color:  #C0305E; }
+.status-concluido { color: #007E7A; }
+.status-andamento { color: #ECB11F; }
+
+/* Mantém os estilos existentes */
 
 .dashboard-card {
   background: #ffffff;
@@ -22,6 +101,8 @@ body {
   margin-bottom: 20px;
   transition: transform 0.3s ease;
   border-left: 6px solid #007E7A;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .dashboard-card:hover {
@@ -33,15 +114,10 @@ body {
   font-weight: bold;
 }
 
-.status-pendente { color: #f44336; }
-.status-concluido { color: #007E7A; }
-.status-andamento { color: #C0305E; }
-
 .progress-bar {
   height: 20px;
   border-radius: 20px;
 }
-
 .table th, .table td {
   vertical-align: middle;
 }
@@ -194,57 +270,17 @@ body {
 </head>
 <body>
 
-  <div class="container">
-    <div class="dashboard-header">
-      
-      <h1 class="header">Revezamento Turma B</h1>
-      <a href="app.html" class="btn-back" aria-label="Voltar"></a></a>
-    </div>
+  <!-- NOVO painel fixo pequeno e simples -->
+  <div id="status-summary">
+    <span class="status-pendente">🔴 <span id="pendente-summary">0</span> Pendentes</span>
+    <span class="status-andamento">🟡 <span id="andamento-summary">0</span> Andamento</span>
+    <span class="status-concluido">🟢 <span id="concluido-summary">0</span> Concluídas</span>
+  </div>
 
-    <div class="row">
-      <!-- Concluído -->
-      <div class="col-md-4">
-        <div class="dashboard-card">
-          <p class="card-title">Concluídas</p>
-          <div class="card-body">
-            <span class="status status-concluido">✅ <span id="concluido">0</span></span>
-            <div class="progress w-50">
-              <div class="progress-bar bg-success" role="progressbar" style="width: 0%" id="barConcluido"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Em Andamento -->
-      <div class="col-md-4">
-        <div class="dashboard-card">
-          <p class="card-title">Andamento</p>
-          <div class="card-body">
-            <span class="status status-andamento">🟡 <span id="andamento">0</span></span>
-            <div class="progress w-50">
-              <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" id="barAndamento"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pendentes -->
-      <div class="col-md-4">
-        <div class="dashboard-card">
-          <p class="card-title">Pendentes</p>
-          <div class="card-body">
-            <span class="status status-pendente">🔴 <span id="pendente">0</span></span>
-            <div class="progress w-50">
-              <div class="progress-bar bg-danger" role="progressbar" style="width: 0%" id="barPendente"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Tabela de Pessoas -->
     <div class="dashboard-card">
-      <h3>Pessoas Ordenadas por hora</h3>
+      <h3 style="text-align: center; font-size: 1.14rem; margin-top: -20px;">Em ordem de conclusão</h3>
       <table class="table table-bordered table-hover">
         <thead>
           <tr>
@@ -259,24 +295,6 @@ body {
       </table>
     </div>
 
-    <!-- GRÁFICOS -->
-    <div class="row">
-      <!-- Gráfico de Status -->
-      <div class="col-md-6">
-        <div class="dashboard-card w-100 h-100">
-          <h3 class="text-center">Distribuição por Status</h3>
-          <canvas id="graficoStatus" height="250"></canvas>
-        </div>
-      </div>
-
-      <!-- Gráfico por Local -->
-      <div class="col-md-6">
-        <div class="dashboard-card w-100 h-100">
-          <h3 class="text-center">Pessoas por Local</h3>
-          <canvas id="graficoLocais" height="250"></canvas>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -290,15 +308,12 @@ body {
         const concluido = data.filter(p => p.status === '✅').length;
         const total = data.length;
 
-        document.getElementById('pendente').textContent = pendente;
-        document.getElementById('andamento').textContent = andamento;
-        document.getElementById('concluido').textContent = concluido;
+        // Atualiza o resumo fixo pequeno no topo
+        document.getElementById('pendente-summary').textContent = pendente;
+        document.getElementById('andamento-summary').textContent = andamento;
+        document.getElementById('concluido-summary').textContent = concluido;
 
-        document.getElementById('barPendente').style.width = (pendente / total * 100 || 0) + '%';
-        document.getElementById('barAndamento').style.width = (andamento / total * 100 || 0) + '%';
-        document.getElementById('barConcluido').style.width = (concluido / total * 100 || 0) + '%';
-
-        // Tabela
+        // Tabela (mantém igual)
         const tbody = document.getElementById('tabelaDashboard');
         tbody.innerHTML = '';
         data.sort((a, b) => {
@@ -318,58 +333,15 @@ body {
         });
 
         // Gráficos
-        gerarGraficos(data);
+        if(typeof gerarGraficos === 'function') gerarGraficos(data);
       });
   }
 
-  function gerarGraficos(data) {
-    const statusContagem = { '🔴': 0, '🟡': 0, '✅': 0 };
-    const locais = {};
-
-    data.forEach(p => {
-      if (statusContagem[p.status] !== undefined) statusContagem[p.status]++;
-      if (p.local) locais[p.local] = (locais[p.local] || 0) + 1;
-    });
-
-    // Gráfico Status
-    new Chart(document.getElementById('graficoStatus'), {
-      type: 'doughnut',
-      data: {
-        labels: ['🔴 Pendentes', '🟡 Em Andamento', '✅ Concluídas'],
-        datasets: [{
-          data: [statusContagem['🔴'], statusContagem['🟡'], statusContagem['✅']],
-          backgroundColor: ['#f44336', '#ffeb3b', '#4caf50']
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
-
-    // Gráfico Locais
-    new Chart(document.getElementById('graficoLocais'), {
-      type: 'bar',
-      data: {
-        labels: Object.keys(locais),
-        datasets: [{
-          label: 'Pessoas por Local',
-          data: Object.values(locais),
-          backgroundColor: '#2196f3'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-      }
-    });
-  }
-
-  // Chama a função de atualizar o dashboard a cada 5 segundos (5000ms)
+  // Atualiza a cada 5 segundos
   setInterval(carregarDashboard, 5000);
 
-  // Carrega os dados inicialmente ao carregar a página
   document.addEventListener('DOMContentLoaded', carregarDashboard);
-</script>
-
+  </script>
 
 </body>
 </html>

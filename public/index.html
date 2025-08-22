@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Revezamento Turma B</title>
-  <link rel="icon" href="image/favicon.jpeg" type="image/png" />
+  <title>Vale</title>
   <style>
-    /* Reset básico */
     * {
       margin: 0;
       padding: 0;
@@ -15,99 +13,67 @@
 
     html, body {
       height: 100%;
+      background-color: #ffffff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #e1e1e1;
       display: flex;
       justify-content: center;
       align-items: center;
-      user-select: none;
-      padding: 1rem;
+      color: #333;
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 1rem;
-      padding: 2.5rem 3rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      max-width: 100%;
-      width: 400px;
-      animation: fadeSlideIn 2.5s ease forwards;
-      box-sizing: border-box;
     }
 
-    @keyframes fadeSlideIn {
-      0% {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .container img {
+      width: 180px;
+      max-width: 80%;
+      margin-bottom: 20px;
     }
 
-    h1 {
-      font-weight: 700;
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      color: #00bcd4;
-      margin-bottom: 1rem;
-      letter-spacing: 0.3rem;
-      text-shadow: 0 0 12px #00bcd4, 0 0 24px #00bcd4;
-      user-select: text;
+    .enter-text {
+      font-size: 1.3rem;
+      color: #555;
+      margin-bottom: 25px;
     }
 
-    p.subtitle {
-      font-weight: 400;
-      font-size: clamp(1rem, 3vw, 1.1rem);
-      margin-bottom: 2.5rem;
-      color: #b0bec5;
-      letter-spacing: 0.08rem;
+    .enter-button {
+      background-color: #007E7A;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    /* Loader */
-    .loader {
-      border: 0.4rem solid rgba(255, 255, 255, 0.15);
-      border-top: 0.4rem solid #00bcd4;
-      border-radius: 50%;
-      width: 3.5rem;
-      height: 3.5rem;
-      margin: 0 auto;
-      animation: spin 1.3s linear infinite;
+    .enter-button:hover {
+      background-color: #006c68;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-
-    /* Ajustes para telas pequenas */
-    @media (max-width: 440px) {
-      .container {
-        width: 100%;
-        padding: 2rem 1.5rem;
-      }
-      h1 {
-        letter-spacing: 0.15rem;
-      }
-      p.subtitle {
-        margin-bottom: 2rem;
-      }
+    .enter-button:active {
+      background-color: #005c59;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
 <body>
-  <div class="container" role="main" aria-label="Tela de apresentação do sistema Revezamento Turma B">
-    <h1>Revezamento Turma B</h1>
-    <p class="subtitle"></p>
-    <div class="loader" aria-hidden="true"></div>
+  <div class="container">
+    <img src="image/vale2.png" alt="Logo Vale" />
+    <p class="enter-text">Revezamento Turma B</p>
+    <button class="enter-button" onclick="entrar()">Entrar</button>
   </div>
 
   <script>
-    setTimeout(() => {
-      window.location.href = '/app.html';
-    }, 5000);
+    function entrar() {
+      window.location.href = "/app";
+    }
   </script>
 </body>
 </html>
