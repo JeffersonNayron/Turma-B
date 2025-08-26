@@ -1,79 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vale</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      background-color: #ffffff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #333;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .container img {
-      width: 180px;
-      max-width: 80%;
-      margin-bottom: 20px;
-    }
-
-    .enter-text {
-      font-size: 1.3rem;
-      color: #555;
-      margin-bottom: 25px;
-    }
-
-    .enter-button {
-      background-color: #007E7A;
-      color: #fff;
-      border: none;
-      padding: 12px 28px;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .enter-button:hover {
-      background-color: #006c68;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .enter-button:active {
-      background-color: #005c59;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revezamento</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body, html { height:100%; display:flex; justify-content:center; align-items:center; background:#f4f4f4; }
+  .container { text-align:center; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:460px; }
+  .container img { width:120px; margin-bottom:20px; }
+  h1 { color:#007E7A; margin-bottom:20px; }
+  button { display:block; width:100%; margin:10px 0; padding:12px 0; font-size:1rem; color:#fff; background:#007E7A; border:none; border-radius:8px; cursor:pointer; position:relative; transition:0.2s; }
+  button:hover { background:#006c68; }
+  .bloqueado { background:#c0305e !important; cursor:not-allowed; }
+  .bloqueado::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:1.5rem; color:#fff; }
+  .msg { margin-top:15px; font-size:0.9rem; color:#c0305e; font-weight:600; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <img src="image/vale2.png" alt="Logo Vale" />
-    <p class="enter-text">Revezamento Turma B</p>
-    <button class="enter-button" onclick="entrar()">Entrar</button>
-  </div>
 
-  <script>
-    function entrar() {
-      window.location.href = "/app";
-    }
-  </script>
+<div class="container" id="inicioScreen">
+  <img src="image/vale2.png" alt="Logo Vale">
+  <h1>Operação 1</h1>
+  <button onclick="abrirTurma('A', this)">Turma A</button>
+  <button onclick="abrirTurma('B', this)">Turma B</button>
+  <button onclick="abrirTurma('C', this)">Turma C</button>
+  <button onclick="abrirTurma('D', this)">Turma D</button>
+  <div id="msgInicio" class="msg"></div>
+</div>
+
+<div class="container" id="sessaoScreen" style="display:none;">
+  <h1 id="tituloTurma"></h1>
+  <button onclick="abrirSessao('Controle', this)">Controle</button>
+  <button onclick="abrirSessao('Inspetoria', this)">Inspetoria</button>
+  <button onclick="abrirSessao('Equipe', this)">Equipe</button>
+  <div id="msgSessao" class="msg"></div>
+</div>
+
+<script>
+let btnBloqueadoInicio = null;
+let btnBloqueadoSessao = null;
+
+function abrirTurma(turma, btn) {
+  const msg = document.getElementById('msgInicio');
+  
+  // Reset botão bloqueado anterior
+  if(btnBloqueadoInicio && btnBloqueadoInicio !== btn) {
+    btnBloqueadoInicio.classList.remove('bloqueado');
+  }
+
+  if(turma !== 'B') {
+    btn.classList.add('bloqueado');
+    msg.innerText = "Sessão disponível em 04 de setembro de 2025";
+    btnBloqueadoInicio = btn;
+  } else {
+    document.getElementById('inicioScreen').style.display = 'none';
+    document.getElementById('sessaoScreen').style.display = 'block';
+    document.getElementById('tituloTurma').innerText = "Turma " + turma;
+  }
+}
+
+function abrirSessao(sessao, btn) {
+  const msg = document.getElementById('msgSessao');
+
+  // Reset botão bloqueado anterior
+  if(btnBloqueadoSessao && btnBloqueadoSessao !== btn) {
+    btnBloqueadoSessao.classList.remove('bloqueado');
+  }
+
+  if(sessao !== 'Equipe') {
+    btn.classList.add('bloqueado');
+    msg.innerText = "Sessão disponível em 04 de setembro de 2025";
+    btnBloqueadoSessao = btn;
+  } else {
+    window.location.href = "/app";
+  }
+}
+</script>
+
 </body>
 </html>
