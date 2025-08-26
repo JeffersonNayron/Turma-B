@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Revezamento</title>
+<link rel="icon" type="image/png" href="image/vale.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   body, html { height:100%; display:flex; justify-content:center; align-items:center; background:#f4f4f4; }
@@ -51,7 +52,7 @@ function abrirTurma(turma, btn) {
 
   if(turma !== 'B') {
     btn.classList.add('bloqueado');
-    msg.innerText = "Sessão disponível em 04 de setembro de 2025";
+    msg.innerText = "Ambiente disponível em 04 de setembro de 2025";
     btnBloqueadoInicio = btn;
   } else {
     document.getElementById('inicioScreen').style.display = 'none';
