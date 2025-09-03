@@ -3,81 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revezamento</title>
+<title>Em Manutenção - Operação de Trens 1</title>
 <link rel="icon" type="image/png" href="image/vale.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   body, html { height:100%; display:flex; justify-content:center; align-items:center; background:#f4f4f4; }
-  .container { text-align:center; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:460px; }
-  .container img { width:120px; margin-bottom:20px; }
-  h1 { color:#007E7A; margin-bottom:20px; }
-  button { display:block; width:100%; margin:10px 0; padding:12px 0; font-size:1rem; color:#fff; background:#007E7A; border:none; border-radius:8px; cursor:pointer; position:relative; transition:0.2s; }
-  button:hover { background:#006c68; }
-  .bloqueado { background:#c0305e !important; cursor:not-allowed; }
-  .bloqueado::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:1.5rem; color:#fff; }
-  .msg { margin-top:15px; font-size:0.9rem; color:#c0305e; font-weight:600; }
+
+  .card {
+    text-align:center;
+    padding:50px 30px;
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    width:100%;
+    max-width:520px;
+    animation: fadeIn 0.8s ease;
+  }
+
+  .card img { width:120px; margin-bottom:20px; }
+  h1 { color:#007E7A; font-size:2rem; margin-bottom:15px; }
+  h2 { color:#c0305e; font-size:1.2rem; margin-bottom:25px; }
+
+  .status {
+    background:#007E7A;
+    color:#fff;
+    padding:14px 18px;
+    border-radius:8px;
+    margin-bottom:20px;
+    font-weight:600;
+    font-size:1.1rem;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
+  }
+
+  .alerta {
+    margin-top:20px;
+    font-size:0.95rem;
+    color:#c0305e;
+    font-weight:600;
+  }
+
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(20px); }
+    to { opacity:1; transform:translateY(0); }
+  }
 </style>
 </head>
 <body>
 
-<div class="container" id="inicioScreen">
+<div class="card">
   <img src="image/vale2.png" alt="Logo Vale">
-  <h1>Operação 1</h1>
-  <button onclick="abrirTurma('A', this)">Turma A</button>
-  <button onclick="abrirTurma('B', this)">Turma B</button>
-  <button onclick="abrirTurma('C', this)">Turma C</button>
-  <button onclick="abrirTurma('D', this)">Turma D</button>
-  <div id="msgInicio" class="msg"></div>
+  <h1>Em manutenção</h1>
+  <h2>Escalando para nível gerencial</h2>
+
+  <div class="status">Operação de Trens 1<br>Todas as turmas do Minério e Carga Geral</div>
+
+  <div class="alerta">Ambiente disponível em breve</div>
 </div>
-
-<div class="container" id="sessaoScreen" style="display:none;">
-  <h1 id="tituloTurma"></h1>
-  <button onclick="abrirSessao('Controle', this)">Controle</button>
-  <button onclick="abrirSessao('Inspetoria', this)">Inspetoria</button>
-  <button onclick="abrirSessao('Equipe', this)">Equipe</button>
-  <div id="msgSessao" class="msg"></div>
-</div>
-
-<script>
-let btnBloqueadoInicio = null;
-let btnBloqueadoSessao = null;
-
-function abrirTurma(turma, btn) {
-  const msg = document.getElementById('msgInicio');
-  
-  // Reset botão bloqueado anterior
-  if(btnBloqueadoInicio && btnBloqueadoInicio !== btn) {
-    btnBloqueadoInicio.classList.remove('bloqueado');
-  }
-
-  if(turma !== 'B') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Ambiente disponível em 04 de setembro de 2025";
-    btnBloqueadoInicio = btn;
-  } else {
-    document.getElementById('inicioScreen').style.display = 'none';
-    document.getElementById('sessaoScreen').style.display = 'block';
-    document.getElementById('tituloTurma').innerText = "Turma " + turma;
-  }
-}
-
-function abrirSessao(sessao, btn) {
-  const msg = document.getElementById('msgSessao');
-
-  // Reset botão bloqueado anterior
-  if(btnBloqueadoSessao && btnBloqueadoSessao !== btn) {
-    btnBloqueadoSessao.classList.remove('bloqueado');
-  }
-
-  if(sessao !== 'Equipe') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Sessão disponível em 04 de setembro de 2025";
-    btnBloqueadoSessao = btn;
-  } else {
-    window.location.href = "/app";
-  }
-}
-</script>
 
 </body>
 </html>
