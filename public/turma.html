@@ -1,152 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Turma</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Revezamento - Manutenção</title>
+<link rel="icon" type="image/png" href="image/vale.png" />
 <style>
-  .hora-inicio, .hora-fim {
-    cursor: pointer;
-    user-select: none;
+  * {
+    margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
-  .segundos { color: #aaa; font-size: 0.75rem; }
-  .quantidade-equipes { text-align: center; margin-bottom: 10px; font-weight: 500; }
-  .btn-outline-primary { background-color: #007E7A !important; color: white !important; border-color: #007E7A !important; }
-  .btn-outline-primary:hover { background-color: #00514f !important; border-color: #00514f !important; color: white !important; }
+  body, html {
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f4f4f4;
+  }
+  .container {
+    text-align:center;
+    padding:30px 20px 40px;
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    width:100%;
+    max-width:460px;
+    position: relative;
+  }
+  .container img {
+    width:140px;
+    margin-bottom:25px;
+  }
+  h1 {
+    font-size:2.5rem;
+    color:#007E7A;
+    margin-bottom: 18px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0.6;}
+  }
+  .message {
+    font-size:1.15rem;
+    color:#444;
+    margin-bottom: 30px;
+  }
+  /* Ícone lâmpada quebrada animada */
+  .lamp-container {
+    width: 80px;
+    margin: 0 auto 30px;
+    filter: drop-shadow(0 0 3px rgba(0,0,0,0.15));
+  }
+  .broken-lamp {
+    animation: shake 1.5s infinite;
+    transform-origin: 50% 90%;
+  }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(-10deg); }
+    75% { transform: rotate(8deg); }
+  }
+  /* Rodapé simples */
+  .footer {
+    font-size:0.85rem;
+    color:#999;
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+  }
 </style>
 </head>
-<body class="container py-4">
+<body>
 
-<header class="cabecalho-app shadow-sm rounded mb-4 px-3 py-3">
-  <div class="d-flex flex-column">
-    <div id="dataAtual" class="data-header mb-1"></div>
-    <h1 class="titulo-app m-0 text-primary" style="color: #007E7A;">
-      <img src="image/vale.png" alt="logo" class="logo"> Turma
-    </h1>
-    <p class="quantidade-equipes">Quantidade de pessoas: <span id="contadorPessoas">0</span></p>
+  <div class="container" role="main" aria-label="Sistema em manutenção">
+    <img src="image/vale2.png" alt="Logo Vale" />
+    <div class="lamp-container" aria-hidden="true">
+      <!-- SVG lâmpada quebrada -->
+      <svg class="broken-lamp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#007E7A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M32 2a14 14 0 0 0-14 14c0 5.256 3.03 10.07 7.5 12.19V34a2 2 0 0 0 4 0v-5.81C42.97 26.07 46 21.255 46 16a14 14 0 0 0-14-14z"/>
+        <path d="M32 34v10a6 6 0 0 0 12 0v-4" />
+        <path d="M32 44H22a6 6 0 0 0 0 12h20a6 6 0 0 0 0-12H34" />
+        <!-- rachadura -->
+        <line x1="32" y1="16" x2="38" y2="24" stroke="#c0305e" stroke-width="2" />
+        <line x1="38" y1="24" x2="34" y2="28" stroke="#c0305e" stroke-width="2" />
+        <line x1="34" y1="28" x2="40" y2="36" stroke="#c0305e" stroke-width="2" />
+      </svg>
+    </div>
+    <h1>Sistema em manutenção</h1>
+    <p class="message">Estamos ajustando tudo para você. Voltamos <strong>em breve</strong>!</p>
+
+    <div class="footer">© 2025 | Revezamento de equipes OP 1</div>
   </div>
-</header>
-
-<div class="table-responsive">
-  <table class="table table-bordered table-hover align-middle text-center">
-    <thead>
-      <tr>
-        <th>Status</th>
-        <th>Pessoa</th>
-        <th>Disponível</th>
-        <th>Local</th>
-        <th>Início</th>
-        <th>Final</th>
-        <th>Retorno</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaCorpo"></tbody>
-  </table>
-</div>
-
-<script>
-function detectarSO() {
-  const ua = navigator.userAgent || navigator.vendor || window.opera;
-  if (/android/i.test(ua)) return 'Android';
-  if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'iPhone';
-  if (/Win/i.test(ua)) return 'PC Windows';
-  if (/Mac/i.test(ua)) return 'PC Mac';
-  if (/Linux/i.test(ua)) return 'PC Linux';
-  return 'Outro';
-}
-
-let estaEditandoId = null;
-
-function carregarPessoas() {
-  fetch('/pessoas')
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById('tabelaCorpo');
-      tbody.innerHTML = '';
-      // Filtra apenas a lista "principal" para Turma
-      const listaPrincipal = data.filter(p => p.lista === 'principal');
-      document.getElementById('contadorPessoas').textContent = listaPrincipal.length;
-
-      function formatarHora(hora) {
-        if (!hora) return '-';
-        return hora.replace(/(\d{2}:\d{2})(:\d{2})/, "$1<span class='segundos'>$2</span>");
-      }
-
-      listaPrincipal.forEach(p => {
-        const tr = document.createElement('tr');
-        tr.style.backgroundColor = p.disponivel ? '#d4edda' : '';
-        tr.innerHTML = `
-          <td>${p.status}</td>
-          <td>${p.nome}</td>
-          <td>${p.disponivel||''}</td>
-          <td>${p.local}</td>
-          <td class="hora-inicio" data-id="${p.id}">${formatarHora(p.hora_inicio)}</td>
-          <td class="hora-fim" data-id="${p.id}">${formatarHora(p.hora_fim)}</td>
-          <td>${p.retorno||''}</td>
-          <td>
-            <button class="btn btn-outline-primary btn-sm" onclick="iniciar(${p.id})">Iniciar</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-
-        // Edição de horário
-        tr.querySelector('.hora-inicio').onclick = () => editarHora(p.id, 'inicio', tr.querySelector('.hora-inicio'));
-        tr.querySelector('.hora-fim').onclick = () => editarHora(p.id, 'fim', tr.querySelector('.hora-fim'));
-      });
-    });
-}
-
-function editarHora(id, tipo, td) {
-  if (estaEditandoId) return; // evita abrir vários inputs
-  estaEditandoId = id;
-  const valorAtual = td.textContent.trim().slice(0,5) || '00:00';
-  const input = document.createElement('input');
-  input.type = 'time';
-  input.value = valorAtual;
-  input.style.maxWidth = '100px';
-  td.innerHTML = '';
-  td.appendChild(input);
-  input.focus();
-
-  input.onblur = () => {
-    const novoValor = input.value;
-    if (!novoValor) { estaEditandoId = null; carregarPessoas(); return; }
-    // Atualiza backend
-    let dados = {};
-    if (tipo === 'inicio') {
-      const dtInicio = novoValor + ':00';
-      const dtFim = new Date(new Date().setHours(parseInt(novoValor.split(':')[0]), parseInt(novoValor.split(':')[1])+75)).toTimeString().slice(0,8);
-      dados = { id, hora_inicio: dtInicio, hora_fim: dtFim };
-    } else {
-      dados = { id, hora_fim: novoValor + ':00' };
-    }
-    fetch('/editarHorario', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dados) })
-      .then(()=>{ estaEditandoId = null; carregarPessoas(); })
-      .catch(()=>{ estaEditandoId = null; carregarPessoas(); });
-  };
-
-  input.onkeydown = (e) => {
-    if (e.key==='Enter') input.blur();
-    if (e.key==='Escape') { estaEditandoId = null; carregarPessoas(); }
-  };
-}
-
-function iniciar(id){
-  fetch('/iniciar', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id})})
-    .then(carregarPessoas);
-}
-
-setInterval(() => { if(!estaEditandoId) carregarPessoas(); }, 5000);
-carregarPessoas();
-
-// Data atual
-const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-const hoje = new Date();
-document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR',opcoes).charAt(0).toUpperCase()+hoje.toLocaleDateString('pt-BR',opcoes).slice(1);
-</script>
 
 </body>
 </html>

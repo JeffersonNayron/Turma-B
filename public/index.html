@@ -1,99 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revezamento</title>
-<link rel="icon" type="image/png" href="image/vale.png">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Revezamento - Manutenção</title>
+<link rel="icon" type="image/png" href="image/vale.png" />
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  body, html { height:100%; display:flex; justify-content:center; align-items:center; background:#f4f4f4; }
-  .container { text-align:center; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:460px; }
-  .container img { width:120px; margin-bottom:20px; }
-  h1 { color:#007E7A; margin-bottom:20px; }
-  button { display:block; width:100%; margin:10px 0; padding:12px 0; font-size:1rem; color:#fff; background:#007E7A; border:none; border-radius:8px; cursor:pointer; position:relative; transition:0.2s; }
-  button:hover { background:#006c68; }
-  .bloqueado { background:#c0305e !important; cursor:not-allowed; }
-  .bloqueado::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:1.5rem; color:#fff; }
-  .msg { margin-top:15px; font-size:0.9rem; color:#c0305e; font-weight:600; }
-  .aviso { margin-top:20px; font-size:0.85rem; color:#444; font-style:italic; }
-  /* Contato fixo no canto da tela */
-  .contato {
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#fff;
-    padding:6px 10px;
-    border-radius:8px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-    font-size:0.8rem;
-    z-index:9999;
+  * {
+    margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
-  .contato img { width:18px; height:18px; }
-  .contato a { text-decoration:none; color:#007E7A; font-weight:600; }
-  .contato a:hover { text-decoration:underline; }
+  body, html {
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f4f4f4;
+  }
+  .container {
+    text-align:center;
+    padding:30px 20px 40px;
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    width:100%;
+    max-width:460px;
+    position: relative;
+  }
+  .container img {
+    width:140px;
+    margin-bottom:25px;
+  }
+  h1 {
+    font-size:2.5rem;
+    color:#007E7A;
+    margin-bottom: 18px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0.6;}
+  }
+  .message {
+    font-size:1.15rem;
+    color:#444;
+    margin-bottom: 30px;
+  }
+  /* Ícone lâmpada quebrada animada */
+  .lamp-container {
+    width: 80px;
+    margin: 0 auto 30px;
+    filter: drop-shadow(0 0 3px rgba(0,0,0,0.15));
+  }
+  .broken-lamp {
+    animation: shake 1.5s infinite;
+    transform-origin: 50% 90%;
+  }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(-10deg); }
+    75% { transform: rotate(8deg); }
+  }
+  /* Rodapé simples */
+  .footer {
+    font-size:0.85rem;
+    color:#999;
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+  }
 </style>
 </head>
 <body>
 
-<div class="container" id="inicioScreen">
-  <img src="image/vale2.png" alt="Logo Vale">
-  <h1>Operação 1</h1>
-  <button onclick="abrirTurma('A', this)">Turma A</button>
-  <button onclick="abrirTurma('B', this)">Turma B</button>
-  <button onclick="abrirTurma('C', this)">Turma C</button>
-  <button onclick="abrirTurma('D', this)">Turma D</button>
-  <div id="msgInicio" class="msg"></div>
-  <div class="aviso">⚠️ Este sistema será migrado em breve para uma versão mais completa e corporativa.</div>
-</div>
+  <div class="container" role="main" aria-label="Sistema em manutenção">
+    <img src="image/vale2.png" alt="Logo Vale" />
+    <div class="lamp-container" aria-hidden="true">
+      <!-- SVG lâmpada quebrada -->
+      <svg class="broken-lamp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#007E7A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M32 2a14 14 0 0 0-14 14c0 5.256 3.03 10.07 7.5 12.19V34a2 2 0 0 0 4 0v-5.81C42.97 26.07 46 21.255 46 16a14 14 0 0 0-14-14z"/>
+        <path d="M32 34v10a6 6 0 0 0 12 0v-4" />
+        <path d="M32 44H22a6 6 0 0 0 0 12h20a6 6 0 0 0 0-12H34" />
+        <!-- rachadura -->
+        <line x1="32" y1="16" x2="38" y2="24" stroke="#c0305e" stroke-width="2" />
+        <line x1="38" y1="24" x2="34" y2="28" stroke="#c0305e" stroke-width="2" />
+        <line x1="34" y1="28" x2="40" y2="36" stroke="#c0305e" stroke-width="2" />
+      </svg>
+    </div>
+    <h1>Sistema em manutenção</h1>
+    <p class="message">Estamos ajustando tudo para você. Voltamos <strong>em breve</strong>!</p>
 
-<div class="container" id="sessaoScreen" style="display:none;">
-  <h1 id="tituloTurma"></h1>
-  <button onclick="abrirSessao('Controle', this)">Controle</button>
-  <button onclick="abrirSessao('Inspetoria', this)">Inspetoria</button>
-  <button onclick="abrirSessao('Equipe', this)">Equipe</button>
-  <div id="msgSessao" class="msg"></div>
-</div>
-
-<!-- Contato WhatsApp fixo -->
-<div class="contato">
-  <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-  <a href="https://wa.me/5598985761913" target="_blank">Fale comigo no WhatsApp</a>
-</div>
-
-<script>
-let btnBloqueadoInicio = null;
-let btnBloqueadoSessao = null;
-
-function abrirTurma(turma, btn) {
-  const msg = document.getElementById('msgInicio');
-  
-  if (turma !== 'B') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Ambiente disponível em 08 de setembro de 2025";
-    btnBloqueadoInicio = btn;
-  } else {
-    document.getElementById('inicioScreen').style.display = 'none';
-    document.getElementById('sessaoScreen').style.display = 'block';
-    document.getElementById('tituloTurma').innerText = "Turma " + turma;
-  }
-}
-
-function abrirSessao(sessao, btn) {
-  const msg = document.getElementById('msgSessao');
-
-  if(sessao !== 'Equipe') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Ambiente disponível em 08 de setembro de 2025";
-    btnBloqueadoSessao = btn;
-  } else {
-    window.location.href = "/app";
-  }
-}
-</script>
+    <div class="footer">© 2025 | Revezamento de equipes OP 1</div>
+  </div>
 
 </body>
 </html>
