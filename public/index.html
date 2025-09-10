@@ -1,99 +1,60 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revezamento</title>
-<link rel="icon" type="image/png" href="image/vale.png">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  body, html { height:100%; display:flex; justify-content:center; align-items:center; background:#f4f4f4; }
-  .container { text-align:center; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:460px; }
-  .container img { width:120px; margin-bottom:20px; }
-  h1 { color:#007E7A; margin-bottom:20px; }
-  button { display:block; width:100%; margin:10px 0; padding:12px 0; font-size:1rem; color:#fff; background:#007E7A; border:none; border-radius:8px; cursor:pointer; position:relative; transition:0.2s; }
-  button:hover { background:#006c68; }
-  .bloqueado { background:#c0305e !important; cursor:not-allowed; }
-  .bloqueado::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:1.5rem; color:#fff; }
-  .msg { margin-top:15px; font-size:0.9rem; color:#c0305e; font-weight:600; }
-  .aviso { margin-top:20px; font-size:0.85rem; color:#444; font-style:italic; }
-  /* Contato fixo no canto da tela */
-  .contato {
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#fff;
-    padding:6px 10px;
-    border-radius:8px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-    font-size:0.8rem;
-    z-index:9999;
-  }
-  .contato img { width:18px; height:18px; }
-  .contato a { text-decoration:none; color:#007E7A; font-weight:600; }
-  .contato a:hover { text-decoration:underline; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Revezamento</title>
+  <link rel="icon" type="image/png" href="image/vale.png">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, sans-serif; }
+    body {
+      display:flex; justify-content:center; align-items:center;
+      height:100vh; background:linear-gradient(135deg,#007E7A,#00b3ad);
+    }
+    .card {
+      background:rgba(255,255,255,0.95);
+      padding:30px; border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.25);
+      text-align:center; width:100%; max-width:400px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(-15px);} to{opacity:1; transform:translateY(0);} }
+    .card img { width:100px; margin-bottom:15px; }
+    h1 { color:#007E7A; margin-bottom:25px; }
+    button {
+      width:100%; margin:10px 0; padding:12px;
+      border:none; border-radius:10px; font-size:1rem; font-weight:600;
+      color:#fff; background:#007E7A; cursor:pointer; transition:0.25s;
+    }
+    button:hover { background:#006c68; transform:translateY(-2px); }
+    .footer { margin-top:15px; font-size:0.85rem; color:#444; font-style:italic; }
+    .contato {
+      position:fixed; bottom:15px; right:15px;
+      background:#fff; padding:8px 12px; border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2); font-size:0.8rem;
+      display:flex; align-items:center; gap:8px;
+    }
+    .contato img { width:18px; height:18px; }
+    .contato a { text-decoration:none; color:#007E7A; font-weight:600; }
+    .contato a:hover { text-decoration:underline; }
+  </style>
 </head>
 <body>
 
-<div class="container" id="inicioScreen">
-  <img src="image/vale2.png" alt="Logo Vale">
-  <h1>Operação 1</h1>
-  <button onclick="abrirTurma('A', this)">Turma A</button>
-  <button onclick="abrirTurma('B', this)">Turma B</button>
-  <button onclick="abrirTurma('C', this)">Turma C</button>
-  <button onclick="abrirTurma('D', this)">Turma D</button>
-  <div id="msgInicio" class="msg"></div>
-  <div class="aviso">⚠️ Este sistema será migrado em breve para uma versão mais completa e corporativa.</div>
-</div>
+  <div class="card">
+    <img src="image/vale2.png" alt="Logo Vale">
+    <h1>Operação 1</h1>
+    <button onclick="window.location.href='https://turma-a-production.up.railway.app/login.html'">Turma A</button>
+    <button onclick="window.location.href='https://turma-b-production-db00.up.railway.app/login.html'">Turma B</button>
+    <button onclick="window.location.href='https://turma-c-production.up.railway.app/login.html'">Turma C</button>
+    <button onclick="window.location.href='https://turma-d-production.up.railway.app/login.html'">Turma D</button>
+    <div class="footer">⚠️Sistema em desenvolvimento.</div>
+  </div>
 
-<div class="container" id="sessaoScreen" style="display:none;">
-  <h1 id="tituloTurma"></h1>
-  <button onclick="abrirSessao('Controle', this)">Controle</button>
-  <button onclick="abrirSessao('Inspetoria', this)">Inspetoria</button>
-  <button onclick="abrirSessao('Equipe', this)">Equipe</button>
-  <div id="msgSessao" class="msg"></div>
-</div>
-
-<!-- Contato WhatsApp fixo -->
-<div class="contato">
-  <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-  <a href="https://wa.me/5598985761913" target="_blank">Fale comigo no WhatsApp</a>
-</div>
-
-<script>
-let btnBloqueadoInicio = null;
-let btnBloqueadoSessao = null;
-
-function abrirTurma(turma, btn) {
-  const msg = document.getElementById('msgInicio');
-  
-  if (turma !== 'B') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Ambiente disponível em breve";
-    btnBloqueadoInicio = btn;
-  } else {
-    document.getElementById('inicioScreen').style.display = 'none';
-    document.getElementById('sessaoScreen').style.display = 'block';
-    document.getElementById('tituloTurma').innerText = "Turma " + turma;
-  }
-}
-
-function abrirSessao(sessao, btn) {
-  const msg = document.getElementById('msgSessao');
-
-  if(sessao !== 'Equipe') {
-    btn.classList.add('bloqueado');
-    msg.innerText = "Ambiente disponível em breve";
-    btnBloqueadoSessao = btn;
-  } else {
-    window.location.href = "/app";
-  }
-}
-</script>
+  <div class="contato">
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    <a href="https://wa.me/5598985761913" target="_blank">Me envie sugestões e melhorias</a>
+  </div>
 
 </body>
 </html>
